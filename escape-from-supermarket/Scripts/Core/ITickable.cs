@@ -1,0 +1,7 @@
+namespace EscapeFromSupermarket.Core
+{
+    public interface ITickable
+    {
+        void Tick(double delta);
+    }
+}
