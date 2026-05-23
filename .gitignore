@@ -1,0 +1,13 @@
+# Godot 4+ specific ignores
+escape-from-supermarket/.godot/
+/escape-from-supermarket/android/
+
+# .NET / C# build artifacts
+escape-from-supermarket/.mono/
+escape-from-supermarket/bin/
+escape-from-supermarket/obj/
+*.csproj.user
+*.swp
+
+# Codex review scratch
+.codex_review_input.txt
