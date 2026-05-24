@@ -66,7 +66,7 @@ Fix batch landed in the same commit:
 - #23 `ShelfController._Ready` throws if `ShelfId <= 0`; `ResolveShelfId()` fallback removed (no quiet zero default).
 - #25 `ExtractionSystem.Tick` sets `IsExtracting = false` before dispatching the win command — no more per-frame `EndRoundCommand` allocations after the threshold is crossed.
 
-### 2026-05-23 — Regression fix: guard catch gated on Chasing — commit pending
+### 2026-05-23 — Regression fix: guard catch gated on Chasing — commit `6973569`
 
 User回归测试: "保安发现玩家后不再追逐玩家". Root cause: `GuardController._PhysicsProcess` runs the catch check (`DistanceTo(player) <= CatchDistance`) independent of guard state, so when the patrol path crosses the player's position the round ended on the first frame of proximity — Alert bar flashed once, no observable chase, immediate Lost panel.
 
@@ -96,4 +96,4 @@ User回归测试: "保安发现玩家后不再追逐玩家". Root cause: `GuardC
 - <bullet per file or per sub-change, naming paths>
 ```
 
-If the work is still uncommitted, write `commit pending` and update the SHA when the commit lands. If a batch closes a Codex review, reference the review numbering (`Major #N`, `Minor #N`) so future readers can cross-check.
+If the work is still uncommitted, write `commit `6973569`` and update the SHA when the commit lands. If a batch closes a Codex review, reference the review numbering (`Major #N`, `Minor #N`) so future readers can cross-check.
