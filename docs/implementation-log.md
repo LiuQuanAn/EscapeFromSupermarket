@@ -23,7 +23,7 @@ Architecture scaffold + movable player.
 - Step 0 — `Scripts/Architecture/Supermarket.cs` with `RegisterTickable` / `UnregisterTickable` / `Tick(double)` (pending add/remove queue flush, codex P2 fix already baked in); `Scripts/Core/ITickable.cs`; `Scripts/Controllers/GameRoot.cs` (`Node3D` root — necessary because `Main.tscn` root is `Node3D`); `Scenes/Main.tscn` minimal scene.
 - Step 1 — `Models/CartModel.cs` (CurrentSlots/Weight/Value BindableProperties, LoadTier derived, `List<CartItem> Items` placeholder for Step 3+); `Systems/MovementSystem.cs` GetSpeedMultiplier (1.00 / 0.85 / 0.65); `Controllers/PlayerController.cs` Tunic camera (Player.Camera3D pitch −45° + yaw +45° orthographic), Visual child carries player + cart meshes and rotates to face movement direction, WASD projected through camera basis.
 
-### 2026-05-23 — Steps 2-8 (codex-implemented while额度耗尽) — uncommitted, rolled into next commit
+### 2026-05-23 — Steps 2-8 (codex-implemented while额度耗尽) — commit `d057435`
 
 Codex finished the full prototype loop minus tuning.
 
@@ -35,7 +35,7 @@ Codex finished the full prototype loop minus tuning.
 - Step 7 — `Models/GuardModel.cs` (PatrolPath + Alert + GuardState); `Commands/AdjustAlertCommand.cs`; `Controllers/GuardController.cs` (vision cone + raycast in controller, not in a System).
 - Step 8 — `Commands/DropProductCommand.cs`; `Controllers/UI/CartPanelController.cs` (Tab toggle).
 
-### 2026-05-23 — Plan revisions + bug-fix batch — same commit as above
+### 2026-05-23 — Plan revisions + bug-fix batch — commit `d057435`
 
 Plan accepts these architectural offsets:
 - `IController`/`ISystem`/`ICommand` carry `ICanGetUtility`; `IController`/`ICommand` carry `ICanSendQuery`; `ISystem` carries `ICanSendCommand`. Mirrored into `QFramework.cs` `LOCAL FORK NOTICE`.
@@ -54,7 +54,7 @@ Fix batch landed in the same commit:
 - Minor #12: `Main.tscn` `CloseButton` declaration moved inside `ShelfPanel/Margin/Content` block (was appended at file end).
 - Minor #14: `HudController` `using System;` removed; `Math.Max/Clamp/Ceiling` replaced with `Mathf.Max / Mathf.Clamp / Mathf.CeilToInt`.
 
-### 2026-05-23 — Second codex review batch — pending commit
+### 2026-05-23 — Second codex review batch — commit `d057435`
 
 - #1 `CartModel.AddItem` / `TryRemoveItem` methods own atomic mutation of items + counters + LoadTier; subscription on `CurrentWeight.Register` removed.
 - #9 `GameStateModel.IsExtracting BindableProperty<bool>` introduced. `StartExtractionCommand` / `CancelExtractionCommand` write the model directly; `ExtractionSystem` reads it instead of holding its own `_isActive` flag.
