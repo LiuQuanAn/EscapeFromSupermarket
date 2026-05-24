@@ -44,6 +44,11 @@
  *     TreeExiting signal on UnRegister to prevent double-call / leak.
  *   - EasyEvents: locked Dictionary access; AddEvent overwrites instead of
  *     throwing on duplicate key.
+ *   - ISystem: granted ICanSendCommand mixin. Systems own state mutation
+ *     pipelines (TimerSystem ends rounds, ExtractionSystem completes
+ *     extraction) that legitimately need to dispatch Commands. Spec rules
+ *     are informational only; this codebase treats Systems as first-class
+ *     Command senders.
  *   - Removed Unity-only blocks (UnRegisterOnDestroyTrigger,
  *     UnRegisterWhenGameObjectDestroyed, ComparerAutoRegister, EditorMenus).
  *   - Fixed mArchitecturel typo in AbstractModel.
@@ -257,7 +262,7 @@ namespace QFramework
 	#region System
 
 	public interface ISystem : IBelongToArchitecture, ICanSetArchitecture, ICanGetModel, ICanGetUtility,
-		ICanRegisterEvent, ICanSendEvent, ICanGetSystem
+		ICanRegisterEvent, ICanSendEvent, ICanGetSystem, ICanSendCommand
 	{
 		void Init();
 	}

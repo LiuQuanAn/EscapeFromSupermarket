@@ -3,7 +3,7 @@ using Godot;
 
 namespace EscapeFromSupermarket.Controllers
 {
-    public partial class GameRoot : Node3D
+    public partial class GameRoot : Node
     {
         private Supermarket _arch;
 

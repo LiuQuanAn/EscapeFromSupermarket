@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using EscapeFromSupermarket.Core;
 using EscapeFromSupermarket.Models;
 using EscapeFromSupermarket.Systems;
+using EscapeFromSupermarket.Utilities;
 using QFramework;
 
 namespace EscapeFromSupermarket.Architecture
@@ -17,8 +18,20 @@ namespace EscapeFromSupermarket.Architecture
 
         protected override void Init()
         {
+            this.RegisterUtility(new ProductCatalog());
             this.RegisterModel(new CartModel());
+            this.RegisterModel(new ShelfModel());
+            this.RegisterModel(new GameStateModel());
+            this.RegisterModel(new GuardModel());
             this.RegisterSystem(new MovementSystem());
+
+            var timerSystem = new TimerSystem();
+            this.RegisterSystem(timerSystem);
+            RegisterTickable(timerSystem);
+
+            var extractionSystem = new ExtractionSystem();
+            this.RegisterSystem(extractionSystem);
+            RegisterTickable(extractionSystem);
         }
 
         public void RegisterTickable(ITickable tickable)

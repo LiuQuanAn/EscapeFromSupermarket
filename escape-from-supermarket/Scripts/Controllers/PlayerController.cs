@@ -11,23 +11,41 @@ namespace EscapeFromSupermarket.Controllers
         [Export] public float BaseSpeed { get; set; } = 4.5f;
         [Export] public float TurnSpeed { get; set; } = 12.0f;
         [Export] public NodePath VisualPath { get; set; } = "Visual";
+        [Export] public NodePath CartCollisionPath { get; set; } = "CartCollision";
         [Export] public NodePath CameraPath { get; set; } = "Camera3D";
 
         private CartModel _cart;
         private MovementSystem _movement;
+        private GameStateModel _gameState;
         private Node3D _visual;
+        private CollisionShape3D _cartCollision;
         private Camera3D _camera;
+        private static readonly Vector3 WorldForward = new(0, 0, -1);
+        private static readonly Vector3 WorldRight = new(1, 0, 0);
+        private static readonly Vector3 CartLocalOffset = new(0.0f, -0.2f, -0.9f);
+        private const float MinPlanarDirectionLengthSquared = 0.0001f;
 
         public override void _Ready()
         {
             _cart = this.GetModel<CartModel>();
             _movement = this.GetSystem<MovementSystem>();
-            _visual = GetNodeOrNull<Node3D>(VisualPath);
-            _camera = GetNodeOrNull<Camera3D>(CameraPath);
+            _gameState = this.GetModel<GameStateModel>();
+            _visual = GetNode<Node3D>(VisualPath);
+            _cartCollision = GetNode<CollisionShape3D>(CartCollisionPath);
+            _camera = GetNode<Camera3D>(CameraPath);
+
+            SyncCartCollision(_visual.Rotation.Y);
         }
 
         public override void _PhysicsProcess(double delta)
         {
+            if (_gameState.State.Value != RoundResult.Running)
+            {
+                Velocity = Vector3.Zero;
+                MoveAndSlide();
+                return;
+            }
+
             var input = ReadInputAxes();
             var dir = ProjectToCameraSpace(input);
 
@@ -35,11 +53,13 @@ namespace EscapeFromSupermarket.Controllers
             Velocity = dir * BaseSpeed * mult;
             MoveAndSlide();
 
-            if (dir.LengthSquared() > 0.01f && _visual != null)
+            if (dir.LengthSquared() > 0.01f)
             {
                 // Align Visual's local -Z (Godot forward) with movement direction.
                 var targetYaw = Mathf.Atan2(-dir.X, -dir.Z);
-                _visual.Rotation = new Vector3(0, Mathf.LerpAngle(_visual.Rotation.Y, targetYaw, TurnSpeed * (float)delta), 0);
+                var nextYaw = Mathf.LerpAngle(_visual.Rotation.Y, targetYaw, TurnSpeed * (float)delta);
+                _visual.Rotation = new Vector3(0, nextYaw, 0);
+                SyncCartCollision(nextYaw);
             }
         }
 
@@ -55,17 +75,25 @@ namespace EscapeFromSupermarket.Controllers
 
         private Vector3 ProjectToCameraSpace(Vector2 input)
         {
-            if (_camera == null)
-            {
-                return new Vector3(input.X, 0, input.Y);
-            }
-
             var basis = _camera.GlobalTransform.Basis;
             // Project camera forward (-Z) and right (+X) onto XZ plane.
-            var camForward = new Vector3(-basis.Z.X, 0, -basis.Z.Z).Normalized();
-            var camRight = new Vector3(basis.X.X, 0, basis.X.Z).Normalized();
+            var camForward = SafePlanarDirection(new Vector3(-basis.Z.X, 0, -basis.Z.Z), WorldForward);
+            var camRight = SafePlanarDirection(new Vector3(basis.X.X, 0, basis.X.Z), WorldRight);
             // input.Y = -1 (W) → +camForward; input.X = +1 (D) → +camRight.
             return camRight * input.X + camForward * -input.Y;
+        }
+
+        private static Vector3 SafePlanarDirection(Vector3 direction, Vector3 fallback)
+        {
+            return direction.LengthSquared() > MinPlanarDirectionLengthSquared
+                ? direction.Normalized()
+                : fallback;
+        }
+
+        private void SyncCartCollision(float yaw)
+        {
+            _cartCollision.Position = CartLocalOffset.Rotated(Vector3.Up, yaw);
+            _cartCollision.Rotation = new Vector3(0, yaw, 0);
         }
 
         public IArchitecture GetArchitecture() => Supermarket.Interface;
