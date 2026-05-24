@@ -1,20 +1,36 @@
+using EscapeFromSupermarket.Config;
 using EscapeFromSupermarket.Models;
+using Godot;
 using QFramework;
 
 namespace EscapeFromSupermarket.Systems
 {
     public class MovementSystem : AbstractSystem
     {
-        public float GetSpeedMultiplier(CartLoadTier tier) => tier switch
+        private PrototypeBalance _balance = PrototypeBalance.Default;
+        private MetaProgressModel _metaProgress;
+        private float _playerSpeedUpgradeMultiplier = 1.0f;
+
+        public float GetSpeedMultiplier(CartLoadTier tier)
         {
-            CartLoadTier.Empty => 1.00f,
-            CartLoadTier.Mid   => 0.85f,
-            CartLoadTier.Heavy => 0.65f,
-            _ => 1.00f,
-        };
+            return _balance.GetCartLoadSpeedMultiplier(tier);
+        }
+
+        public float GetPlayerSpeedUpgradeMultiplier()
+        {
+            return _playerSpeedUpgradeMultiplier;
+        }
 
         protected override void OnInit()
         {
+            _balance = this.GetUtility<PrototypeBalance>();
+            _metaProgress = this.GetModel<MetaProgressModel>();
+            _metaProgress.PlayerSpeedLevel.RegisterWithInitValue(UpdatePlayerSpeedUpgradeMultiplier);
+        }
+
+        private void UpdatePlayerSpeedUpgradeMultiplier(int level)
+        {
+            _playerSpeedUpgradeMultiplier = Mathf.Pow(_balance.PlayerSpeedUpgradeMultiplier, level);
         }
     }
 }

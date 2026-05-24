@@ -1,14 +1,17 @@
-[gd_scene load_steps=29 format=3 uid="uid://b8s1m4r2t3kqa"]
+[gd_scene load_steps=36 format=3 uid="uid://b8s1m4r2t3kqa"]
 
-[ext_resource type="Script" path="res://Scripts/Controllers/GameRoot.cs" id="1_root"]
-[ext_resource type="Script" path="res://Scripts/Controllers/PlayerController.cs" id="2_player"]
-[ext_resource type="Script" path="res://Scripts/Controllers/ShelfController.cs" id="3_shelf"]
-[ext_resource type="Script" path="res://Scripts/Controllers/UI/ShelfPanelController.cs" id="4_shelf_panel"]
-[ext_resource type="Script" path="res://Scripts/Controllers/UI/HudController.cs" id="5_hud"]
-[ext_resource type="Script" path="res://Scripts/Controllers/ExtractionZoneController.cs" id="6_extract"]
-[ext_resource type="Script" path="res://Scripts/Controllers/GuardController.cs" id="7_guard"]
-[ext_resource type="Script" path="res://Scripts/Controllers/UI/ResultPanelController.cs" id="8_result_panel"]
-[ext_resource type="Script" path="res://Scripts/Controllers/UI/CartPanelController.cs" id="9_cart_panel"]
+[ext_resource type="Script" uid="uid://b33b1l6c16fos" path="res://Scripts/Controllers/GameRoot.cs" id="1_root"]
+[ext_resource type="Script" uid="uid://tyggc8b8btkn" path="res://Scripts/Controllers/PlayerController.cs" id="2_player"]
+[ext_resource type="Script" uid="uid://jelgq1ld52dq" path="res://Scripts/Controllers/ShelfController.cs" id="3_shelf"]
+[ext_resource type="Script" uid="uid://ee7m0bq0vn1f" path="res://Scripts/Controllers/UI/ShelfPanelController.cs" id="4_shelf_panel"]
+[ext_resource type="Script" uid="uid://cr2pbxawp50vb" path="res://Scripts/Controllers/UI/HudController.cs" id="5_hud"]
+[ext_resource type="Script" uid="uid://b8mi1gbiqfoi8" path="res://Scripts/Controllers/ExtractionZoneController.cs" id="6_extract"]
+[ext_resource type="Script" uid="uid://bn35w3vh7ipun" path="res://Scripts/Controllers/GuardController.cs" id="7_guard"]
+[ext_resource type="Script" uid="uid://br4ob1rwsd8lo" path="res://Scripts/Controllers/UI/ResultPanelController.cs" id="8_result_panel"]
+[ext_resource type="Script" uid="uid://c03exbjie7f4c" path="res://Scripts/Controllers/UI/CartPanelController.cs" id="9_cart_panel"]
+[ext_resource type="Script" uid="uid://d38besqcivog2" path="res://Scripts/Controllers/UI/InteractionManagerController.cs" id="10_interaction"]
+[ext_resource type="Script" uid="uid://eo8s16mych65" path="res://Scripts/Controllers/KeycardController.cs" id="11_keycard"]
+[ext_resource type="Script" uid="uid://dofecopug5nve" path="res://Scripts/Controllers/CustomerController.cs" id="12_customer"]
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_floor"]
 size = Vector2(30, 30)
@@ -16,31 +19,11 @@ size = Vector2(30, 30)
 [sub_resource type="BoxShape3D" id="BoxShape3D_floor"]
 size = Vector3(30, 0.1, 30)
 
-[sub_resource type="CapsuleMesh" id="CapsuleMesh_player"]
-radius = 0.4
-height = 1.6
-
-[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_player"]
-radius = 0.4
-height = 1.6
-
-[sub_resource type="BoxMesh" id="BoxMesh_cart"]
-size = Vector3(0.9, 0.6, 0.8)
-
-[sub_resource type="BoxShape3D" id="BoxShape3D_cart"]
-size = Vector3(0.9, 0.6, 0.8)
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_cart"]
-albedo_color = Color(0.55, 0.55, 0.6, 1)
+[sub_resource type="BoxMesh" id="BoxMesh_outer_wall"]
+size = Vector3(30, 2, 0.4)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_wall"]
 albedo_color = Color(0.45, 0.42, 0.36, 1)
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_shelf"]
-albedo_color = Color(0.25, 0.32, 0.46, 1)
-
-[sub_resource type="BoxMesh" id="BoxMesh_outer_wall"]
-size = Vector3(30, 2, 0.4)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_outer_wall"]
 size = Vector3(30, 2, 0.4)
@@ -48,31 +31,63 @@ size = Vector3(30, 2, 0.4)
 [sub_resource type="BoxMesh" id="BoxMesh_shelf_block"]
 size = Vector3(1.4, 1.5, 7.5)
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_shelf"]
+albedo_color = Color(0.25, 0.32, 0.46, 1)
+
 [sub_resource type="BoxShape3D" id="BoxShape3D_shelf_block"]
 size = Vector3(1.4, 1.5, 7.5)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_shelf_interact"]
 size = Vector3(2.4, 2, 4)
 
+[sub_resource type="BoxMesh" id="BoxMesh_extraction"]
+size = Vector3(4, 0.05, 2.5)
+
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_extraction"]
 transparency = 1
 albedo_color = Color(0.1, 0.85, 0.45, 0.35)
 
-[sub_resource type="BoxMesh" id="BoxMesh_extraction"]
-size = Vector3(4, 0.05, 2.5)
-
 [sub_resource type="BoxShape3D" id="BoxShape3D_extraction"]
 size = Vector3(4, 2, 2.5)
 
+[sub_resource type="BoxMesh" id="BoxMesh_keycard"]
+size = Vector3(0.8, 0.08, 0.5)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_keycard"]
+albedo_color = Color(0.95, 0.85, 0.12, 1)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_keycard"]
+size = Vector3(1.4, 1, 1.4)
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_player"]
+radius = 0.4
+height = 1.6
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_player"]
+radius = 0.4
+height = 1.6
+
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_guard"]
 albedo_color = Color(0.75, 0.18, 0.18, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_vision"]
+size = Vector3(3.5, 0.03, 7)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_vision"]
 transparency = 1
 albedo_color = Color(1, 0.2, 0.1, 0.22)
 
-[sub_resource type="BoxMesh" id="BoxMesh_vision"]
-size = Vector3(3.5, 0.03, 7)
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_customer"]
+albedo_color = Color(0.2, 0.62, 0.82, 1)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_cart"]
+size = Vector3(0.9, 0.6, 0.8)
+
+[sub_resource type="BoxMesh" id="BoxMesh_cart"]
+size = Vector3(0.9, 0.6, 0.8)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_cart"]
+albedo_color = Color(0.55, 0.55, 0.6, 1)
 
 [node name="Main" type="Node3D"]
 script = ExtResource("1_root")
@@ -176,6 +191,7 @@ shape = SubResource("BoxShape3D_shelf_block")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.6, 0.9, -5.2)
 script = ExtResource("3_shelf")
 ShelfId = 1
+ShelfName = "零食货架"
 
 [node name="InteractShape" type="CollisionShape3D" parent="Shelf1"]
 shape = SubResource("BoxShape3D_shelf_interact")
@@ -184,6 +200,7 @@ shape = SubResource("BoxShape3D_shelf_interact")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.6, 0.9, 5.2)
 script = ExtResource("3_shelf")
 ShelfId = 2
+ShelfName = "零食货架"
 
 [node name="InteractShape" type="CollisionShape3D" parent="Shelf2"]
 shape = SubResource("BoxShape3D_shelf_interact")
@@ -192,6 +209,7 @@ shape = SubResource("BoxShape3D_shelf_interact")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.6, 0.9, -5.2)
 script = ExtResource("3_shelf")
 ShelfId = 3
+ShelfName = "日用品货架"
 
 [node name="InteractShape" type="CollisionShape3D" parent="Shelf3"]
 shape = SubResource("BoxShape3D_shelf_interact")
@@ -200,20 +218,44 @@ shape = SubResource("BoxShape3D_shelf_interact")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.6, 0.9, 5.2)
 script = ExtResource("3_shelf")
 ShelfId = 4
+ShelfName = "家电货架"
 
 [node name="InteractShape" type="CollisionShape3D" parent="Shelf4"]
 shape = SubResource("BoxShape3D_shelf_interact")
 
-[node name="ExtractionZone" type="Area3D" parent="."]
+[node name="FrontDoorExtractionZone" type="Area3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, -12.2)
 script = ExtResource("6_extract")
 
-[node name="ExtractionMesh" type="MeshInstance3D" parent="ExtractionZone"]
+[node name="ExtractionMesh" type="MeshInstance3D" parent="FrontDoorExtractionZone"]
 mesh = SubResource("BoxMesh_extraction")
 surface_material_override/0 = SubResource("StandardMaterial3D_extraction")
 
-[node name="ExtractionShape" type="CollisionShape3D" parent="ExtractionZone"]
+[node name="ExtractionShape" type="CollisionShape3D" parent="FrontDoorExtractionZone"]
 shape = SubResource("BoxShape3D_extraction")
+
+[node name="StaffDoorExtractionZone" type="Area3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.2, 0.1, 7.4)
+script = ExtResource("6_extract")
+ExitType = 1
+
+[node name="ExtractionMesh" type="MeshInstance3D" parent="StaffDoorExtractionZone"]
+mesh = SubResource("BoxMesh_extraction")
+surface_material_override/0 = SubResource("StandardMaterial3D_extraction")
+
+[node name="ExtractionShape" type="CollisionShape3D" parent="StaffDoorExtractionZone"]
+shape = SubResource("BoxShape3D_extraction")
+
+[node name="Keycard" type="Area3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.5, 0.45, 10)
+script = ExtResource("11_keycard")
+
+[node name="KeycardMesh" type="MeshInstance3D" parent="Keycard"]
+mesh = SubResource("BoxMesh_keycard")
+surface_material_override/0 = SubResource("StandardMaterial3D_keycard")
+
+[node name="KeycardShape" type="CollisionShape3D" parent="Keycard"]
+shape = SubResource("BoxShape3D_keycard")
 
 [node name="Guard" type="CharacterBody3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 8)
@@ -230,6 +272,45 @@ surface_material_override/0 = SubResource("StandardMaterial3D_guard")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.75, -3.5)
 mesh = SubResource("BoxMesh_vision")
 surface_material_override/0 = SubResource("StandardMaterial3D_vision")
+
+[node name="CustomerLeft" type="CharacterBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 0.8, -8)
+script = ExtResource("12_customer")
+PointA = Vector3(-6, 0.8, -8)
+PointB = Vector3(-6, 0.8, -2)
+
+[node name="CustomerLeftCollision" type="CollisionShape3D" parent="CustomerLeft"]
+shape = SubResource("CapsuleShape3D_player")
+
+[node name="CustomerLeftMesh" type="MeshInstance3D" parent="CustomerLeft"]
+mesh = SubResource("CapsuleMesh_player")
+surface_material_override/0 = SubResource("StandardMaterial3D_customer")
+
+[node name="CustomerRight" type="CharacterBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 0.8, 2)
+script = ExtResource("12_customer")
+PointA = Vector3(6, 0.8, 2)
+PointB = Vector3(6, 0.8, 8)
+
+[node name="CustomerRightCollision" type="CollisionShape3D" parent="CustomerRight"]
+shape = SubResource("CapsuleShape3D_player")
+
+[node name="CustomerRightMesh" type="MeshInstance3D" parent="CustomerRight"]
+mesh = SubResource("CapsuleMesh_player")
+surface_material_override/0 = SubResource("StandardMaterial3D_customer")
+
+[node name="CustomerCenter" type="CharacterBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.5, 0.8, 6)
+script = ExtResource("12_customer")
+PointA = Vector3(-1.5, 0.8, 6)
+PointB = Vector3(2.5, 0.8, 6)
+
+[node name="CustomerCenterCollision" type="CollisionShape3D" parent="CustomerCenter"]
+shape = SubResource("CapsuleShape3D_player")
+
+[node name="CustomerCenterMesh" type="MeshInstance3D" parent="CustomerCenter"]
+mesh = SubResource("CapsuleMesh_player")
+surface_material_override/0 = SubResource("StandardMaterial3D_customer")
 
 [node name="Player" type="CharacterBody3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
@@ -253,7 +334,7 @@ mesh = SubResource("BoxMesh_cart")
 surface_material_override/0 = SubResource("StandardMaterial3D_cart")
 
 [node name="Camera3D" type="Camera3D" parent="Player"]
-transform = Transform3D(0.7071068, -0.5, 0.5, 0, 0.7071068, 0.7071068, -0.7071068, -0.5, 0.5, 7.0710678, 10, 7.0710678)
+transform = Transform3D(0.7071068, -0.5, 0.5, 0, 0.7071068, 0.7071068, -0.7071068, -0.5, 0.5, 7.071068, 10, 7.071068)
 projection = 1
 size = 16.0
 
@@ -264,35 +345,55 @@ script = ExtResource("5_hud")
 offset_left = 20.0
 offset_top = 20.0
 offset_right = 250.0
-offset_bottom = 150.0
+offset_bottom = 190.0
 
 [node name="Margin" type="MarginContainer" parent="UI/HudPanel"]
+layout_mode = 2
 theme_override_constants/margin_left = 12
 theme_override_constants/margin_top = 10
 theme_override_constants/margin_right = 12
 theme_override_constants/margin_bottom = 10
 
 [node name="Content" type="VBoxContainer" parent="UI/HudPanel/Margin"]
+layout_mode = 2
 
 [node name="SlotsLabel" type="Label" parent="UI/HudPanel/Margin/Content"]
+layout_mode = 2
 text = "格子：0/10"
 
 [node name="WeightLabel" type="Label" parent="UI/HudPanel/Margin/Content"]
+layout_mode = 2
 text = "重量：0/30"
 
 [node name="ValueLabel" type="Label" parent="UI/HudPanel/Margin/Content"]
+layout_mode = 2
 text = "估值：0"
 
 [node name="CountdownLabel" type="Label" parent="UI/HudPanel/Margin/Content"]
+layout_mode = 2
 text = "倒计时：--:--"
+
+[node name="ObjectiveLabel" type="Label" parent="UI/HudPanel/Margin/Content"]
+layout_mode = 2
+text = "目标：带出路由器 0/1"
+
+[node name="KeycardLabel" type="Label" parent="UI/HudPanel/Margin/Content"]
+layout_mode = 2
+text = "钥匙卡：无"
 
 [node name="ExtractionBar" type="ProgressBar" parent="UI/HudPanel/Margin/Content"]
 visible = false
+layout_mode = 2
 max_value = 1.0
 
 [node name="AlertBar" type="ProgressBar" parent="UI/HudPanel/Margin/Content"]
 visible = false
+layout_mode = 2
 max_value = 1.0
+
+[node name="InteractionPrompt" type="Label" parent="UI"]
+visible = false
+script = ExtResource("10_interaction")
 
 [node name="ShelfPanel" type="PanelContainer" parent="UI"]
 visible = false
@@ -303,72 +404,127 @@ offset_bottom = 525.0
 script = ExtResource("4_shelf_panel")
 
 [node name="Margin" type="MarginContainer" parent="UI/ShelfPanel"]
+layout_mode = 2
 theme_override_constants/margin_left = 12
 theme_override_constants/margin_top = 12
 theme_override_constants/margin_right = 12
 theme_override_constants/margin_bottom = 12
 
 [node name="Content" type="VBoxContainer" parent="UI/ShelfPanel/Margin"]
+layout_mode = 2
 
 [node name="TitleLabel" type="Label" parent="UI/ShelfPanel/Margin/Content"]
+layout_mode = 2
 text = "货架"
 
 [node name="StatusLabel" type="Label" parent="UI/ShelfPanel/Margin/Content"]
-text = ""
+layout_mode = 2
 
-[node name="ItemList" type="VBoxContainer" parent="UI/ShelfPanel/Margin/Content"]
+[node name="ItemsScroll" type="ScrollContainer" parent="UI/ShelfPanel/Margin/Content"]
+custom_minimum_size = Vector2(0, 220)
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="ItemList" type="VBoxContainer" parent="UI/ShelfPanel/Margin/Content/ItemsScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
 
 [node name="CloseButton" type="Button" parent="UI/ShelfPanel/Margin/Content"]
+layout_mode = 2
 text = "关闭"
 
 [node name="CartPanel" type="PanelContainer" parent="UI"]
 visible = false
-offset_left = 400.0
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -400.0
 offset_top = 20.0
-offset_right = 780.0
+offset_right = -20.0
 offset_bottom = 420.0
 script = ExtResource("9_cart_panel")
 
 [node name="Margin" type="MarginContainer" parent="UI/CartPanel"]
+layout_mode = 2
 theme_override_constants/margin_left = 12
 theme_override_constants/margin_top = 12
 theme_override_constants/margin_right = 12
 theme_override_constants/margin_bottom = 12
 
 [node name="Content" type="VBoxContainer" parent="UI/CartPanel/Margin"]
+layout_mode = 2
 
 [node name="TitleLabel" type="Label" parent="UI/CartPanel/Margin/Content"]
+layout_mode = 2
 text = "购物车"
 
-[node name="ItemList" type="VBoxContainer" parent="UI/CartPanel/Margin/Content"]
+[node name="ItemsScroll" type="ScrollContainer" parent="UI/CartPanel/Margin/Content"]
+custom_minimum_size = Vector2(0, 300)
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="ItemList" type="VBoxContainer" parent="UI/CartPanel/Margin/Content/ItemsScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
 
 [node name="CloseButton" type="Button" parent="UI/CartPanel/Margin/Content"]
+layout_mode = 2
 text = "关闭"
 
 [node name="ResultPanel" type="PanelContainer" parent="UI"]
 visible = false
-offset_left = 430.0
-offset_top = 140.0
-offset_right = 820.0
-offset_bottom = 560.0
+custom_minimum_size = Vector2(390, 520)
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -195.0
+offset_top = -260.0
+offset_right = 195.0
+offset_bottom = 260.0
 script = ExtResource("8_result_panel")
 
 [node name="Margin" type="MarginContainer" parent="UI/ResultPanel"]
+layout_mode = 2
 theme_override_constants/margin_left = 16
 theme_override_constants/margin_top = 16
 theme_override_constants/margin_right = 16
 theme_override_constants/margin_bottom = 16
 
 [node name="Content" type="VBoxContainer" parent="UI/ResultPanel/Margin"]
+layout_mode = 2
 
 [node name="TitleLabel" type="Label" parent="UI/ResultPanel/Margin/Content"]
+layout_mode = 2
 text = "结算"
 
 [node name="ReasonLabel" type="Label" parent="UI/ResultPanel/Margin/Content"]
-text = ""
+layout_mode = 2
 
-[node name="ItemsLabel" type="Label" parent="UI/ResultPanel/Margin/Content"]
-text = ""
+[node name="ItemsScroll" type="ScrollContainer" parent="UI/ResultPanel/Margin/Content"]
+custom_minimum_size = Vector2(340, 220)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="ItemsLabel" type="Label" parent="UI/ResultPanel/Margin/Content/ItemsScroll"]
+custom_minimum_size = Vector2(330, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+autowrap_mode = 2
+
+[node name="MetaLabel" type="Label" parent="UI/ResultPanel/Margin/Content"]
+layout_mode = 2
+
+[node name="CapacityUpgradeButton" type="Button" parent="UI/ResultPanel/Margin/Content"]
+layout_mode = 2
+text = "购物车容量"
+
+[node name="SpeedUpgradeButton" type="Button" parent="UI/ResultPanel/Margin/Content"]
+layout_mode = 2
+text = "基础速度"
 
 [node name="RestartButton" type="Button" parent="UI/ResultPanel/Margin/Content"]
-text = "重新开始"
+layout_mode = 2
+text = "下一轮"

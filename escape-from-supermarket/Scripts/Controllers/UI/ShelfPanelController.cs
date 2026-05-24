@@ -19,7 +19,8 @@ namespace EscapeFromSupermarket.Controllers.UI
         {
             _titleLabel = GetNodeOrNull<Label>("Margin/Content/TitleLabel");
             _statusLabel = GetNodeOrNull<Label>("Margin/Content/StatusLabel");
-            _itemList = GetNodeOrNull<VBoxContainer>("Margin/Content/ItemList");
+            _itemList = GetNodeOrNull<VBoxContainer>("Margin/Content/ItemsScroll/ItemList")
+                ?? GetNodeOrNull<VBoxContainer>("Margin/Content/ItemList");
             _closeButton = GetNodeOrNull<Button>("Margin/Content/CloseButton");
 
             Visible = false;
@@ -28,6 +29,8 @@ namespace EscapeFromSupermarket.Controllers.UI
             this.RegisterEvent<ShelfChangedEvent>(OnShelfChanged)
                 .UnRegisterWhenNodeExitTree(this);
             this.RegisterEvent<PickFailedEvent>(OnPickFailed)
+                .UnRegisterWhenNodeExitTree(this);
+            this.RegisterEvent<RoundEndedEvent>(_ => Visible = false)
                 .UnRegisterWhenNodeExitTree(this);
         }
 

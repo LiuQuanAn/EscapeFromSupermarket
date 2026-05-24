@@ -1,5 +1,7 @@
+using EscapeFromSupermarket.Config;
 using Godot;
 using QFramework;
+using System.Linq;
 
 namespace EscapeFromSupermarket.Models
 {
@@ -10,16 +12,18 @@ namespace EscapeFromSupermarket.Models
         public Vector3[] PatrolPath { get; private set; }
         public BindableProperty<float> Alert { get; } = new(0.0f);
         public BindableProperty<GuardState> State { get; } = new(GuardState.Patrolling);
+        private PrototypeBalance _balance = PrototypeBalance.Default;
 
         protected override void OnInit()
         {
-            PatrolPath = new[]
-            {
-                new Vector3(0, 0.8f, 10),
-                new Vector3(0, 0.8f, -10),
-                new Vector3(7, 0.8f, -10),
-                new Vector3(7, 0.8f, 10),
-            };
+            _balance = this.GetUtility<PrototypeBalance>();
+            PatrolPath = _balance.GuardPatrolPath.ToArray();
+        }
+
+        public void ResetRound()
+        {
+            Alert.Value = 0.0f;
+            State.Value = GuardState.Patrolling;
         }
     }
 }

@@ -1,4 +1,5 @@
 using EscapeFromSupermarket.Architecture;
+using EscapeFromSupermarket.Config;
 using EscapeFromSupermarket.Models;
 using EscapeFromSupermarket.Systems;
 using Godot;
@@ -8,25 +9,25 @@ namespace EscapeFromSupermarket.Controllers
 {
     public partial class PlayerController : CharacterBody3D, IController
     {
-        [Export] public float BaseSpeed { get; set; } = 4.5f;
-        [Export] public float TurnSpeed { get; set; } = 12.0f;
         [Export] public NodePath VisualPath { get; set; } = "Visual";
         [Export] public NodePath CartCollisionPath { get; set; } = "CartCollision";
         [Export] public NodePath CameraPath { get; set; } = "Camera3D";
 
+        private PrototypeBalance _balance = PrototypeBalance.Default;
         private CartModel _cart;
         private MovementSystem _movement;
         private GameStateModel _gameState;
         private Node3D _visual;
         private CollisionShape3D _cartCollision;
         private Camera3D _camera;
+        private float _customerSlowTimer;
         private static readonly Vector3 WorldForward = new(0, 0, -1);
         private static readonly Vector3 WorldRight = new(1, 0, 0);
-        private static readonly Vector3 CartLocalOffset = new(0.0f, -0.2f, -0.9f);
         private const float MinPlanarDirectionLengthSquared = 0.0001f;
 
         public override void _Ready()
         {
+            _balance = this.GetUtility<PrototypeBalance>();
             _cart = this.GetModel<CartModel>();
             _movement = this.GetSystem<MovementSystem>();
             _gameState = this.GetModel<GameStateModel>();
@@ -50,14 +51,16 @@ namespace EscapeFromSupermarket.Controllers
             var dir = ProjectToCameraSpace(input);
 
             float mult = _movement.GetSpeedMultiplier(_cart.LoadTier.Value);
-            Velocity = dir * BaseSpeed * mult;
+            float slowMult = _customerSlowTimer > 0.0f ? _balance.CustomerSlowMultiplier : 1.0f;
+            _customerSlowTimer = Mathf.Max(0.0f, _customerSlowTimer - (float)delta);
+            Velocity = dir * _balance.PlayerBaseSpeed * _movement.GetPlayerSpeedUpgradeMultiplier() * mult * slowMult;
             MoveAndSlide();
 
             if (dir.LengthSquared() > 0.01f)
             {
                 // Align Visual's local -Z (Godot forward) with movement direction.
                 var targetYaw = Mathf.Atan2(-dir.X, -dir.Z);
-                var nextYaw = Mathf.LerpAngle(_visual.Rotation.Y, targetYaw, TurnSpeed * (float)delta);
+                var nextYaw = Mathf.LerpAngle(_visual.Rotation.Y, targetYaw, _balance.PlayerTurnSpeed * (float)delta);
                 _visual.Rotation = new Vector3(0, nextYaw, 0);
                 SyncCartCollision(nextYaw);
             }
@@ -92,8 +95,13 @@ namespace EscapeFromSupermarket.Controllers
 
         private void SyncCartCollision(float yaw)
         {
-            _cartCollision.Position = CartLocalOffset.Rotated(Vector3.Up, yaw);
+            _cartCollision.Position = _balance.CartCollisionLocalOffset.Rotated(Vector3.Up, yaw);
             _cartCollision.Rotation = new Vector3(0, yaw, 0);
+        }
+
+        public void ApplyCustomerSlow()
+        {
+            _customerSlowTimer = _balance.CustomerSlowSeconds;
         }
 
         public IArchitecture GetArchitecture() => Supermarket.Interface;

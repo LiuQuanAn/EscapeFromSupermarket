@@ -20,15 +20,17 @@ namespace EscapeFromSupermarket.Queries
         {
             var shelf = this.GetModel<ShelfModel>();
             var cart = this.GetModel<CartModel>();
+            var meta = this.GetModel<MetaProgressModel>();
             var item = shelf?.FindItem(_shelfId, _instanceId);
             if (item == null) return new CanPickProductResult(false, "该商品已经不在货架上。");
 
-            if (cart.CurrentSlots.Value + item.Product.Slots > CartModel.Capacity)
+            int capacity = cart.GetCapacity(meta?.CartCapacityLevel.Value ?? 0);
+            if (cart.CurrentSlots.Value + item.Product.Slots > capacity)
             {
                 return new CanPickProductResult(false, "购物车格子不够。");
             }
 
-            if (cart.CurrentWeight.Value + item.Product.Weight > CartModel.WeightLimit)
+            if (cart.CurrentWeight.Value + item.Product.Weight > cart.WeightLimit)
             {
                 return new CanPickProductResult(false, "购物车太重。");
             }

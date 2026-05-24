@@ -72,10 +72,20 @@ User回归测试: "保安发现玩家后不再追逐玩家". Root cause: `GuardC
 
 - `GuardController.cs` — catch condition now requires `_guard.State.Value == GuardState.Chasing` in addition to `!_caughtFired` and the distance test. Patrol-pass-by no longer ends the round; the player must be detected (Alert reaches 1.0) and the guard must be physically chasing before contact counts.
 
+### 2026-05-24 — V0.2 vertical slice — commit `pending`
+
+Implemented `docs/v0.2-vertical-slice-spec.md` on top of the V0.1 prototype, plus the first review cleanup batch before commit.
+
+- Balance / models — `PrototypeBalance` became the shared tuning entry; added `MetaProgressModel` for runtime money/upgrades/navigation progress and `RoundObjectiveModel` for keycard/router state. `CartModel`, `GameStateModel`, `GuardModel`, `ShelfModel`, `MovementSystem`, and `ProductCatalog` now read V0.2 state and tuning from those models/utilities.
+- Interactions / world objects — added `IInteractionTarget`, `InteractionManagerController`, `KeycardController`, and dual extraction doors. Shelves, keycard, and exits now use nearest-target world prompts; employee door requires keycard and uses a shorter extraction time.
+- V0.2 loop — added router task item, guaranteed per-round router/high-value shelf refresh, win-only money rewards, router-only navigation progress, buyable cart-capacity and movement-speed upgrades, and `StartNextRoundCommand` so singleton models reset per round while meta progress survives scene reload.
+- NPC / scene — added `CustomerController` and 3 simple blocking customers; added right-side employee exit, keycard, HUD objective/keycard labels, result-panel upgrade buttons, and scroll containers for shelf/cart/result item lists.
+- Review cleanup — restored `Main.tscn` UID to `uid://b8s1m4r2t3kqa`, removed invalid `unique_id=<number>` scene pollution, removed new `?? PrototypeBalance.Default` and `?.ResetRound()` fallbacks, cached speed-upgrade and extraction HUD state, guarded interaction prompts behind camera, and documented the next-round reset/reload split.
+
 ## Pending
 
-- Step 9 — `数值调参`: tune base speed, load multipliers, guard patrol/chase speeds, vision angle, alert raise/decay rates, countdown length, product slot/weight/value ratios, extraction read time.
-- End-to-end validation against `docs/prototype-spec.md` §13 acceptance checklist.
+- V0.2 manual 5-10 round playtest: route choice, employee-door usage, router pickup, upgrade order, customer blocking feel, UI readability, and 3-5 minute round length.
+- V0.2 tuning pass in `PrototypeBalance`: movement/load multipliers, guard vision/alert/chase, extraction timing, product value/slots/weight, customer speed/push, upgrade prices.
 
 ## Plan revisions
 
@@ -85,6 +95,7 @@ User回归测试: "保安发现玩家后不再追逐玩家". Root cause: `GuardC
 | 2026-05-23 | Codex first-pass plan review: ITickable registration moved to `Supermarket.Init()`, `CartModel.Items` advanced to Step 1, `DetectionSystem` dropped (Guard does its own raycast), `RoundResult` unified, `ExtractionProgress` moved to `GameStateModel`, 4 shelves, stable `InstanceId`. | Plan v2 |
 | 2026-05-23 | Local-fork divergence accepted: `ISystem`/`IController`/`ICommand` extra mixins, CartCollision as Step 1 extension, Guard root rotation. | Plan v3 |
 | 2026-05-23 | Second codex review batch (above) — no plan text change, just implementation refinement. | — |
+| 2026-05-24 | V0.2 vertical slice scoped by `docs/v0.2-vertical-slice-spec.md`: interaction prompts, keycard/staff door, router objective, runtime meta progress, upgrades, customers, and 5-10 round tuning target. | V0.2 spec |
 
 ## Convention for new entries
 

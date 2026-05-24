@@ -1,5 +1,6 @@
 using EscapeFromSupermarket.Architecture;
 using EscapeFromSupermarket.Commands;
+using EscapeFromSupermarket.Config;
 using EscapeFromSupermarket.Models;
 using Godot;
 using QFramework;
@@ -8,15 +9,7 @@ namespace EscapeFromSupermarket.Controllers
 {
     public partial class GuardController : CharacterBody3D, IController
     {
-        [Export] public float PatrolSpeed { get; set; } = 2.0f;
-        [Export] public float ChaseSpeed { get; set; } = 3.5f;
-        [Export] public float TurnSpeed { get; set; } = 10.0f;
-        [Export] public float ViewDistance { get; set; } = 7.0f;
-        [Export] public float ViewAngleDegrees { get; set; } = 70.0f;
-        [Export] public float RaiseRate { get; set; } = 0.55f;
-        [Export] public float DecayRate { get; set; } = 0.35f;
-        [Export] public float CatchDistance { get; set; } = 1.05f;
-
+        private PrototypeBalance _balance = PrototypeBalance.Default;
         private GuardModel _guard;
         private CartModel _cart;
         private GameStateModel _gameState;
@@ -26,6 +19,7 @@ namespace EscapeFromSupermarket.Controllers
 
         public override void _Ready()
         {
+            _balance = this.GetUtility<PrototypeBalance>();
             _guard = this.GetModel<GuardModel>();
             _cart = this.GetModel<CartModel>();
             _gameState = this.GetModel<GameStateModel>();
@@ -53,7 +47,7 @@ namespace EscapeFromSupermarket.Controllers
             // rise once and gets a Lost screen without ever observing the chase.
             if (!_caughtFired
                 && _guard.State.Value == GuardState.Chasing
-                && GlobalPosition.DistanceTo(_player.GlobalPosition) <= CatchDistance)
+                && GlobalPosition.DistanceTo(_player.GlobalPosition) <= _balance.GuardCatchDistance)
             {
                 _caughtFired = true;
                 this.SendCommand(EndRoundCommand.Lose(LossReason.Caught));
@@ -72,7 +66,7 @@ namespace EscapeFromSupermarket.Controllers
             }
 
             bool canSeeLoadedPlayer = _cart.CurrentSlots.Value > 0 && CanSeePlayer();
-            float alertDelta = (canSeeLoadedPlayer ? RaiseRate : -DecayRate) * delta;
+            float alertDelta = (canSeeLoadedPlayer ? _balance.GuardAlertRaiseRate : -_balance.GuardAlertDecayRate) * delta;
             this.SendCommand(new AdjustAlertCommand(alertDelta));
         }
 
@@ -81,7 +75,7 @@ namespace EscapeFromSupermarket.Controllers
             var toPlayer = _player.GlobalPosition - GlobalPosition;
             toPlayer.Y = 0;
             float distSq = toPlayer.LengthSquared();
-            if (distSq <= 0.0001f || distSq > ViewDistance * ViewDistance) return false;
+            if (distSq <= 0.0001f || distSq > _balance.GuardViewDistance * _balance.GuardViewDistance) return false;
 
             var forward = -GlobalTransform.Basis.Z;
             forward.Y = 0;
@@ -89,7 +83,7 @@ namespace EscapeFromSupermarket.Controllers
 
             var direction = toPlayer.Normalized();
             float angle = Mathf.RadToDeg(forward.AngleTo(direction));
-            if (angle > ViewAngleDegrees * 0.5f) return false;
+            if (angle > _balance.GuardViewAngleDegrees * 0.5f) return false;
 
             var spaceState = GetWorld3D().DirectSpaceState;
             var from = GlobalPosition + Vector3.Up * 0.8f;
@@ -111,7 +105,7 @@ namespace EscapeFromSupermarket.Controllers
             var toTarget = target - GlobalPosition;
             toTarget.Y = 0;
 
-            if (_guard.State.Value == GuardState.Patrolling && toTarget.Length() < 0.35f)
+            if (_guard.State.Value == GuardState.Patrolling && toTarget.Length() < _balance.GuardPatrolArrivalDistance)
             {
                 _patrolIndex = (_patrolIndex + 1) % _guard.PatrolPath.Length;
                 toTarget = CurrentPatrolTarget() - GlobalPosition;
@@ -126,12 +120,12 @@ namespace EscapeFromSupermarket.Controllers
             }
 
             var direction = toTarget.Normalized();
-            float speed = _guard.State.Value == GuardState.Chasing ? ChaseSpeed : PatrolSpeed;
+            float speed = _guard.State.Value == GuardState.Chasing ? _balance.GuardChaseSpeed : _balance.GuardPatrolSpeed;
             Velocity = direction * speed;
             MoveAndSlide();
 
             float targetYaw = Mathf.Atan2(-direction.X, -direction.Z);
-            Rotation = new Vector3(0, Mathf.LerpAngle(Rotation.Y, targetYaw, TurnSpeed * delta), 0);
+            Rotation = new Vector3(0, Mathf.LerpAngle(Rotation.Y, targetYaw, _balance.GuardTurnSpeed * delta), 0);
         }
 
         private Vector3 CurrentPatrolTarget()

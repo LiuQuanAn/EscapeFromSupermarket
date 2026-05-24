@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using EscapeFromSupermarket.Config;
 using EscapeFromSupermarket.Utilities;
 using QFramework;
 
@@ -14,8 +15,10 @@ namespace EscapeFromSupermarket.Models
 
     public class CartModel : AbstractModel
     {
-        public const int Capacity = 10;
-        public const int WeightLimit = 30;
+        private PrototypeBalance _balance = PrototypeBalance.Default;
+
+        public int Capacity => _balance.CartCapacity;
+        public int WeightLimit => _balance.CartWeightLimit;
 
         public BindableProperty<int> CurrentSlots { get; } = new(0);
         public BindableProperty<int> CurrentWeight { get; } = new(0);
@@ -31,6 +34,12 @@ namespace EscapeFromSupermarket.Models
 
         protected override void OnInit()
         {
+            _balance = this.GetUtility<PrototypeBalance>();
+        }
+
+        public int GetCapacity(int capacityUpgradeLevel)
+        {
+            return _balance.CartCapacity + capacityUpgradeLevel * _balance.CartCapacityUpgradeBonus;
         }
 
         /// <summary>
@@ -72,11 +81,23 @@ namespace EscapeFromSupermarket.Models
             return true;
         }
 
-        private static CartLoadTier ComputeTier(int weight)
+        public bool ContainsTaskItem(string taskKey)
         {
-            if (weight < 10) return CartLoadTier.Empty;
-            if (weight < 22) return CartLoadTier.Mid;
-            return CartLoadTier.Heavy;
+            return Items.Exists(item => item.Product.TaskKey == taskKey);
+        }
+
+        public void ResetRound()
+        {
+            Items.Clear();
+            CurrentSlots.Value = 0;
+            CurrentWeight.Value = 0;
+            CurrentValue.Value = 0;
+            LoadTier.Value = CartLoadTier.Empty;
+        }
+
+        private CartLoadTier ComputeTier(int weight)
+        {
+            return _balance.GetCartLoadTier(weight);
         }
     }
 }

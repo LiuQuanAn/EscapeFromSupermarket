@@ -1,3 +1,4 @@
+using EscapeFromSupermarket.Config;
 using EscapeFromSupermarket.Events;
 using EscapeFromSupermarket.Models;
 using QFramework;
@@ -32,10 +33,31 @@ namespace EscapeFromSupermarket.Commands
             var gameState = this.GetModel<GameStateModel>();
             if (gameState.State.Value != RoundResult.Running) return;
 
+            if (_result == RoundResult.Won)
+            {
+                ApplyWinRewards();
+            }
+
             gameState.Loss.Value = _lossReason;
             gameState.Win.Value = _winReason;
             gameState.State.Value = _result;
             this.SendEvent(new RoundEndedEvent(_result));
+        }
+
+        private void ApplyWinRewards()
+        {
+            var cart = this.GetModel<CartModel>();
+            var meta = this.GetModel<MetaProgressModel>();
+            var objective = this.GetModel<RoundObjectiveModel>();
+
+            meta.Money.Value += cart.CurrentValue.Value;
+
+            bool routerExtracted = cart.ContainsTaskItem(PrototypeBalance.RouterTaskKey);
+            objective.RouterExtractedThisRound.Value = routerExtracted;
+            if (routerExtracted)
+            {
+                meta.NavigationProgress.Value++;
+            }
         }
     }
 }

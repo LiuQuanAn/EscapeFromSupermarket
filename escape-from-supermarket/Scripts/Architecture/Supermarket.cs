@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using EscapeFromSupermarket.Config;
 using EscapeFromSupermarket.Core;
 using EscapeFromSupermarket.Models;
 using EscapeFromSupermarket.Systems;
@@ -18,7 +19,11 @@ namespace EscapeFromSupermarket.Architecture
 
         protected override void Init()
         {
-            this.RegisterUtility(new ProductCatalog());
+            var balance = new PrototypeBalance();
+            this.RegisterUtility(balance);
+            this.RegisterUtility(new ProductCatalog(balance));
+            this.RegisterModel(new MetaProgressModel());
+            this.RegisterModel(new RoundObjectiveModel());
             this.RegisterModel(new CartModel());
             this.RegisterModel(new ShelfModel());
             this.RegisterModel(new GameStateModel());

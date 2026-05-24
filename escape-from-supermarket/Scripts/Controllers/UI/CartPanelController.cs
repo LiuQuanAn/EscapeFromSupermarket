@@ -14,13 +14,16 @@ namespace EscapeFromSupermarket.Controllers.UI
 
         public override void _Ready()
         {
-            _itemList = GetNodeOrNull<VBoxContainer>("Margin/Content/ItemList");
+            _itemList = GetNodeOrNull<VBoxContainer>("Margin/Content/ItemsScroll/ItemList")
+                ?? GetNodeOrNull<VBoxContainer>("Margin/Content/ItemList");
             _closeButton = GetNodeOrNull<Button>("Margin/Content/CloseButton");
 
             Visible = false;
             if (_closeButton != null) _closeButton.Pressed += () => Visible = false;
 
             this.RegisterEvent<CartItemsChangedEvent>(_ => Rebuild())
+                .UnRegisterWhenNodeExitTree(this);
+            this.RegisterEvent<RoundEndedEvent>(_ => Visible = false)
                 .UnRegisterWhenNodeExitTree(this);
         }
 

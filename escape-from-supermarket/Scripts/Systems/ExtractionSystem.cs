@@ -7,8 +7,6 @@ namespace EscapeFromSupermarket.Systems
 {
     public class ExtractionSystem : AbstractSystem, ITickable
     {
-        private const float RequiredSeconds = 3.0f;
-
         private GameStateModel _gameState;
 
         protected override void OnInit()
@@ -22,7 +20,7 @@ namespace EscapeFromSupermarket.Systems
             if (!_gameState.IsExtracting.Value) return;
 
             _gameState.ExtractionProgress.Value += (float)delta;
-            if (_gameState.ExtractionProgress.Value >= RequiredSeconds)
+            if (_gameState.ExtractionProgress.Value >= _gameState.CurrentExtractionRequiredSeconds.Value)
             {
                 _gameState.IsExtracting.Value = false;
                 this.SendCommand(EndRoundCommand.Win(WinReason.Extracted));

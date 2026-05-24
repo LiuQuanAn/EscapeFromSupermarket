@@ -1,27 +1,26 @@
 using System;
 using System.Collections.Generic;
+using EscapeFromSupermarket.Config;
 using QFramework;
 
 namespace EscapeFromSupermarket.Utilities
 {
-    public sealed record Product(string ProductTypeId, string Name, int Value, int Slots, int Weight, string Category);
+    public sealed record Product(string ProductTypeId, string Name, int Value, int Slots, int Weight, string Category, string TaskKey = "");
 
     public class ProductCatalog : IUtility
     {
-        private readonly List<Product> _products = new()
-        {
-            new Product("chips", "薯片", 6, 1, 1, "零食"),
-            new Product("canned_soup", "罐头汤", 9, 1, 3, "零食"),
-            new Product("toothpaste", "牙膏", 12, 1, 1, "日用品"),
-            new Product("detergent", "洗衣液", 18, 2, 5, "日用品"),
-            new Product("microwave", "微波炉", 45, 4, 12, "家电"),
-            new Product("television", "电视", 70, 5, 16, "家电"),
-        };
-
+        private readonly List<Product> _products;
         private readonly Dictionary<string, IReadOnlyList<Product>> _byCategory;
 
         public ProductCatalog()
+            : this(PrototypeBalance.Default)
         {
+        }
+
+        public ProductCatalog(PrototypeBalance balance)
+        {
+            _products = new List<Product>(balance.Products);
+
             var buckets = new Dictionary<string, List<Product>>();
             foreach (var product in _products)
             {
@@ -48,6 +47,11 @@ namespace EscapeFromSupermarket.Utilities
             return _byCategory.TryGetValue(category, out var list)
                 ? list
                 : Array.Empty<Product>();
+        }
+
+        public Product FindByTypeId(string productTypeId)
+        {
+            return _products.Find(x => x.ProductTypeId == productTypeId);
         }
     }
 }
