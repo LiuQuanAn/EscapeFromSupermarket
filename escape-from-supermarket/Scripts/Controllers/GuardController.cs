@@ -48,7 +48,12 @@ namespace EscapeFromSupermarket.Controllers
             UpdateDetection((float)delta);
             MoveGuard((float)delta);
 
-            if (!_caughtFired && GlobalPosition.DistanceTo(_player.GlobalPosition) <= CatchDistance)
+            // Catch only counts while actively Chasing — patrol-pass-by must not
+            // trigger an immediate loss, otherwise the player sees the alert bar
+            // rise once and gets a Lost screen without ever observing the chase.
+            if (!_caughtFired
+                && _guard.State.Value == GuardState.Chasing
+                && GlobalPosition.DistanceTo(_player.GlobalPosition) <= CatchDistance)
             {
                 _caughtFired = true;
                 this.SendCommand(EndRoundCommand.Lose(LossReason.Caught));
@@ -57,6 +62,15 @@ namespace EscapeFromSupermarket.Controllers
 
         private void UpdateDetection(float delta)
         {
+            if (_guard.State.Value == GuardState.Chasing)
+            {
+                if (_guard.Alert.Value < 1.0f)
+                {
+                    this.SendCommand(new AdjustAlertCommand(1.0f - _guard.Alert.Value));
+                }
+                return;
+            }
+
             bool canSeeLoadedPlayer = _cart.CurrentSlots.Value > 0 && CanSeePlayer();
             float alertDelta = (canSeeLoadedPlayer ? RaiseRate : -DecayRate) * delta;
             this.SendCommand(new AdjustAlertCommand(alertDelta));

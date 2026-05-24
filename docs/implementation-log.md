@@ -66,6 +66,12 @@ Fix batch landed in the same commit:
 - #23 `ShelfController._Ready` throws if `ShelfId <= 0`; `ResolveShelfId()` fallback removed (no quiet zero default).
 - #25 `ExtractionSystem.Tick` sets `IsExtracting = false` before dispatching the win command — no more per-frame `EndRoundCommand` allocations after the threshold is crossed.
 
+### 2026-05-23 — Regression fix: guard catch gated on Chasing — commit pending
+
+User回归测试: "保安发现玩家后不再追逐玩家". Root cause: `GuardController._PhysicsProcess` runs the catch check (`DistanceTo(player) <= CatchDistance`) independent of guard state, so when the patrol path crosses the player's position the round ended on the first frame of proximity — Alert bar flashed once, no observable chase, immediate Lost panel.
+
+- `GuardController.cs` — catch condition now requires `_guard.State.Value == GuardState.Chasing` in addition to `!_caughtFired` and the distance test. Patrol-pass-by no longer ends the round; the player must be detected (Alert reaches 1.0) and the guard must be physically chasing before contact counts.
+
 ## Pending
 
 - Step 9 — `数值调参`: tune base speed, load multipliers, guard patrol/chase speeds, vision angle, alert raise/decay rates, countdown length, product slot/weight/value ratios, extraction read time.
