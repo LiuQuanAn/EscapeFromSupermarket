@@ -5,7 +5,22 @@ using QFramework;
 
 namespace EscapeFromSupermarket.Utilities
 {
-    public sealed record Product(string ProductTypeId, string Name, int Value, int Slots, int Weight, string Category, string TaskKey = "");
+    public enum ProductRarity
+    {
+        Common,
+        Rare,
+        HighRare,
+    }
+
+    public sealed record Product(
+        string ProductTypeId,
+        string Name,
+        int Value,
+        int Slots,
+        int Weight,
+        string Category,
+        string TaskKey = "",
+        ProductRarity Rarity = ProductRarity.Common);
 
     public class ProductCatalog : IUtility
     {

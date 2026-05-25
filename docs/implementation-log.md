@@ -82,10 +82,20 @@ Implemented `docs/v0.2-vertical-slice-spec.md` on top of the V0.1 prototype, plu
 - NPC / scene — added `CustomerController` and 3 simple blocking customers; added right-side employee exit, keycard, HUD objective/keycard labels, result-panel upgrade buttons, and scroll containers for shelf/cart/result item lists.
 - Review cleanup — restored `Main.tscn` UID to `uid://b8s1m4r2t3kqa`, removed invalid `unique_id=<number>` scene pollution, removed new `?? PrototypeBalance.Default` and `?.ResetRound()` fallbacks, cached speed-upgrade and extraction HUD state, guarded interaction prompts behind camera, and documented the next-round reset/reload split.
 
+### 2026-05-24 — Shelf item identification — commit `pending`
+
+Implemented `docs/shelf-item-identification-spec.md` so shelf loot starts hidden and is revealed one item at a time while the game continues running.
+
+- Data / tuning — added `ProductRarity`, per-rarity identification times, and task-item identification time in `PrototypeBalance`; microwave is rare, television is high rare, and router uses task timing.
+- Shelf state — `ShelfModel` now tracks identified shelf item instances for the current round, clears identification on `RefreshRound()`, and removes identification state when an item leaves a shelf.
+- Commands / picking — added `IdentifyShelfItemCommand`; `CanPickProductQuery` rejects unknown items before capacity and weight checks.
+- UI / interruption — `ShelfPanelController` now shows unknown placeholders, one active countdown/progress bar, complete item details only after identification, and resets unfinished progress when the panel closes, round ends, or the player leaves shelf range.
+
 ## Pending
 
 - V0.2 manual 5-10 round playtest: route choice, employee-door usage, router pickup, upgrade order, customer blocking feel, UI readability, and 3-5 minute round length.
 - V0.2 tuning pass in `PrototypeBalance`: movement/load multipliers, guard vision/alert/chase, extraction timing, product value/slots/weight, customer speed/push, upgrade prices.
+- Manual shelf-identification playtest: order reveal, close/reopen reset, same-round remembered identified items, and unknown-item pick rejection.
 
 ## Plan revisions
 
@@ -96,6 +106,7 @@ Implemented `docs/v0.2-vertical-slice-spec.md` on top of the V0.1 prototype, plu
 | 2026-05-23 | Local-fork divergence accepted: `ISystem`/`IController`/`ICommand` extra mixins, CartCollision as Step 1 extension, Guard root rotation. | Plan v3 |
 | 2026-05-23 | Second codex review batch (above) — no plan text change, just implementation refinement. | — |
 | 2026-05-24 | V0.2 vertical slice scoped by `docs/v0.2-vertical-slice-spec.md`: interaction prompts, keycard/staff door, router objective, runtime meta progress, upgrades, customers, and 5-10 round tuning target. | V0.2 spec |
+| 2026-05-24 | Shelf interaction now requires per-round item identification before pick, scoped by `docs/shelf-item-identification-spec.md`. | Shelf item identification spec |
 
 ## Convention for new entries
 

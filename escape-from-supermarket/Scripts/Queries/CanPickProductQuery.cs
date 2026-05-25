@@ -21,10 +21,15 @@ namespace EscapeFromSupermarket.Queries
             var shelf = this.GetModel<ShelfModel>();
             var cart = this.GetModel<CartModel>();
             var meta = this.GetModel<MetaProgressModel>();
-            var item = shelf?.FindItem(_shelfId, _instanceId);
+            var item = shelf.FindItem(_shelfId, _instanceId);
             if (item == null) return new CanPickProductResult(false, "该商品已经不在货架上。");
 
-            int capacity = cart.GetCapacity(meta?.CartCapacityLevel.Value ?? 0);
+            if (!shelf.IsItemIdentified(_instanceId))
+            {
+                return new CanPickProductResult(false, "需要先识别该商品。");
+            }
+
+            int capacity = cart.GetCapacity(meta.CartCapacityLevel.Value);
             if (cart.CurrentSlots.Value + item.Product.Slots > capacity)
             {
                 return new CanPickProductResult(false, "购物车格子不够。");

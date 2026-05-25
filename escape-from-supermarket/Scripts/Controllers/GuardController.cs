@@ -1,3 +1,4 @@
+using System;
 using EscapeFromSupermarket.Architecture;
 using EscapeFromSupermarket.Commands;
 using EscapeFromSupermarket.Config;
@@ -9,11 +10,15 @@ namespace EscapeFromSupermarket.Controllers
 {
     public partial class GuardController : CharacterBody3D, IController
     {
+        [Export] public NodePath PatrolPathNode { get; set; }
+
         private PrototypeBalance _balance = PrototypeBalance.Default;
         private GuardModel _guard;
         private CartModel _cart;
         private GameStateModel _gameState;
         private PlayerController _player;
+        private Path3D _patrolPath;
+        private Curve3D _patrolCurve;
         private int _patrolIndex;
         private bool _caughtFired;
 
@@ -24,6 +29,20 @@ namespace EscapeFromSupermarket.Controllers
             _cart = this.GetModel<CartModel>();
             _gameState = this.GetModel<GameStateModel>();
             _player = GetTree().CurrentScene?.GetNodeOrNull<PlayerController>("Player");
+
+            if (PatrolPathNode == null || PatrolPathNode.IsEmpty)
+            {
+                throw new InvalidOperationException(
+                    $"{Name}: PatrolPathNode 未配置。请在 GuardController 实例上指定 Path3D 路线节点。");
+            }
+
+            _patrolPath = GetNode<Path3D>(PatrolPathNode);
+            _patrolCurve = _patrolPath.Curve;
+            if (_patrolCurve == null || _patrolCurve.PointCount == 0)
+            {
+                throw new InvalidOperationException(
+                    $"{Name}: PatrolPathNode 指向的 Path3D 没有 Curve 或点位。请在 Path3D 上设置巡逻点。");
+            }
         }
 
         public override void _PhysicsProcess(double delta)
@@ -107,7 +126,7 @@ namespace EscapeFromSupermarket.Controllers
 
             if (_guard.State.Value == GuardState.Patrolling && toTarget.Length() < _balance.GuardPatrolArrivalDistance)
             {
-                _patrolIndex = (_patrolIndex + 1) % _guard.PatrolPath.Length;
+                _patrolIndex = (_patrolIndex + 1) % _patrolCurve.PointCount;
                 toTarget = CurrentPatrolTarget() - GlobalPosition;
                 toTarget.Y = 0;
             }
@@ -130,8 +149,7 @@ namespace EscapeFromSupermarket.Controllers
 
         private Vector3 CurrentPatrolTarget()
         {
-            if (_guard.PatrolPath == null || _guard.PatrolPath.Length == 0) return GlobalPosition;
-            return _guard.PatrolPath[_patrolIndex % _guard.PatrolPath.Length];
+            return _patrolPath.ToGlobal(_patrolCurve.GetPointPosition(_patrolIndex % _patrolCurve.PointCount));
         }
 
         public IArchitecture GetArchitecture() => Supermarket.Interface;

@@ -16,6 +16,7 @@ namespace EscapeFromSupermarket.Models
         private int _nextInstanceId;
         private ProductCatalog _catalog;
         private PrototypeBalance _balance = PrototypeBalance.Default;
+        private readonly HashSet<int> _identifiedInstanceIds = new();
 
         public Dictionary<int, List<ShelfItemInstance>> Inventories { get; } = new();
 
@@ -29,6 +30,7 @@ namespace EscapeFromSupermarket.Models
         public void RefreshRound()
         {
             Inventories.Clear();
+            _identifiedInstanceIds.Clear();
             _nextInstanceId = 0;
             if (_catalog == null) return;
 
@@ -48,6 +50,27 @@ namespace EscapeFromSupermarket.Models
             return items.Find(i => i.InstanceId == instanceId);
         }
 
+        public bool IsItemIdentified(int instanceId)
+        {
+            return _identifiedInstanceIds.Contains(instanceId);
+        }
+
+        public void MarkItemIdentified(int shelfId, int instanceId)
+        {
+            if (FindItem(shelfId, instanceId) == null)
+            {
+                throw new InvalidOperationException($"Cannot identify missing shelf item: shelf={shelfId}, instance={instanceId}");
+            }
+
+            _identifiedInstanceIds.Add(instanceId);
+        }
+
+        public ShelfItemInstance FindNextUnidentifiedItem(int shelfId)
+        {
+            if (!Inventories.TryGetValue(shelfId, out var items)) return null;
+            return items.Find(item => !_identifiedInstanceIds.Contains(item.InstanceId));
+        }
+
         public bool RemoveItem(int shelfId, int instanceId, out ShelfItemInstance item)
         {
             item = null;
@@ -58,6 +81,7 @@ namespace EscapeFromSupermarket.Models
 
             item = items[index];
             items.RemoveAt(index);
+            _identifiedInstanceIds.Remove(instanceId);
             return true;
         }
 

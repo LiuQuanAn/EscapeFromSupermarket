@@ -42,7 +42,7 @@ namespace EscapeFromSupermarket.Controllers
         public void Interact(PlayerController player)
         {
             _panel ??= GetTree().CurrentScene?.GetNodeOrNull<ShelfPanelController>("UI/ShelfPanel");
-            _panel?.ToggleShelf(ShelfId);
+            _panel?.ToggleShelf(this);
         }
 
         public IArchitecture GetArchitecture() => Supermarket.Interface;
