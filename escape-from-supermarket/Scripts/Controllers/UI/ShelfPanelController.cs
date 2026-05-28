@@ -89,7 +89,7 @@ namespace EscapeFromSupermarket.Controllers.UI
         private bool PlayerLeftCurrentShelf()
         {
             if (_currentShelf == null) return false;
-            return _player.GlobalPosition.DistanceTo(_currentShelf.GlobalPosition) > _currentShelf.InteractionRange;
+            return !_currentShelf.IsPlayerInInteractionArea(_player);
         }
 
         private void CloseShelf()

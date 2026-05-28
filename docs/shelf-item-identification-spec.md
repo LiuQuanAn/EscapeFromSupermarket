@@ -2,7 +2,7 @@
 
 日期：2026-05-24
 
-状态：待实现
+状态：已实现
 
 关联设计：`docs/gameplay-design.md` 第 8 章、`docs/design-log.md` 第 33 轮。
 

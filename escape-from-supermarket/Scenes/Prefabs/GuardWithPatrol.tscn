@@ -1,0 +1,51 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://Scripts/Controllers/GuardController.cs" id="1_guard"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_guard"]
+radius = 0.4
+height = 1.6
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_guard"]
+radius = 0.4
+height = 1.6
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_guard"]
+albedo_color = Color(0.75, 0.18, 0.18, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_vision"]
+size = Vector3(3.5, 0.03, 7)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_vision"]
+transparency = 1
+albedo_color = Color(1, 0.2, 0.1, 0.22)
+
+[sub_resource type="Curve3D" id="Curve3D_guard_patrol"]
+closed = true
+_data = {
+"points": PackedVector3Array(0, 0, 0, 0, 0, 0, 0, 0.8, 10, 0, 0, 0, 0, 0, 0, 0, 0.8, -10, 0, 0, 0, 0, 0, 0, 7, 0.8, -10, 0, 0, 0, 0, 0, 0, 7, 0.8, 10),
+"tilts": PackedFloat32Array(0, 0, 0, 0)
+}
+point_count = 4
+
+[node name="GuardWithPatrol" type="Node3D"]
+
+[node name="GuardBody" type="CharacterBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 8)
+script = ExtResource("1_guard")
+PatrolPathNode = NodePath("../PatrolPath")
+
+[node name="GuardCollision" type="CollisionShape3D" parent="GuardBody"]
+shape = SubResource("CapsuleShape3D_guard")
+
+[node name="GuardMesh" type="MeshInstance3D" parent="GuardBody"]
+mesh = SubResource("CapsuleMesh_guard")
+surface_material_override/0 = SubResource("StandardMaterial3D_guard")
+
+[node name="VisionCone" type="MeshInstance3D" parent="GuardBody"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.75, -3.5)
+mesh = SubResource("BoxMesh_vision")
+surface_material_override/0 = SubResource("StandardMaterial3D_vision")
+
+[node name="PatrolPath" type="Path3D" parent="."]
+curve = SubResource("Curve3D_guard_patrol")

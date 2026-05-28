@@ -1,0 +1,43 @@
+[gd_scene format=3 uid="uid://1im4dxbgnr22"]
+
+[ext_resource type="Script" uid="uid://jelgq1ld52dq" path="res://Scripts/Controllers/ShelfController.cs" id="1_shelf"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_shelf_block"]
+size = Vector3(1.4, 1.5, 7.5)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_shelf"]
+albedo_color = Color(0.25, 0.32, 0.46, 1)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_shelf_block"]
+size = Vector3(1.4, 1.5, 7.5)
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_interact_projection"]
+size = Vector2(4, 4)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_interact_projection"]
+transparency = 1
+albedo_color = Color(0.95, 0.72, 0.12, 0.3)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_shelf_interact"]
+size = Vector3(4, 2, 4)
+
+[node name="InteractiveShelf" type="Area3D" unique_id=2062766032]
+script = ExtResource("1_shelf")
+
+[node name="ShelfBody" type="StaticBody3D" parent="." unique_id=378144972]
+
+[node name="ShelfMesh" type="MeshInstance3D" parent="ShelfBody" unique_id=1691369392]
+mesh = SubResource("BoxMesh_shelf_block")
+surface_material_override/0 = SubResource("StandardMaterial3D_shelf")
+
+[node name="ShelfCollision" type="CollisionShape3D" parent="ShelfBody" unique_id=1787125398]
+shape = SubResource("BoxShape3D_shelf_block")
+
+[node name="InteractProjection" type="MeshInstance3D" parent="." unique_id=1775040049]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.745, 0)
+mesh = SubResource("PlaneMesh_interact_projection")
+surface_material_override/0 = SubResource("StandardMaterial3D_interact_projection")
+
+[node name="InteractShape" type="CollisionShape3D" parent="." unique_id=178001353]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.15, 0)
+shape = SubResource("BoxShape3D_shelf_interact")

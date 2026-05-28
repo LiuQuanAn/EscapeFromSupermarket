@@ -1,0 +1,24 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://Scripts/Controllers/CustomerController.cs" id="1_customer"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_customer"]
+radius = 0.4
+height = 1.6
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_customer"]
+radius = 0.4
+height = 1.6
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_customer"]
+albedo_color = Color(0.2, 0.62, 0.82, 1)
+
+[node name="Customer" type="CharacterBody3D"]
+script = ExtResource("1_customer")
+
+[node name="CustomerCollision" type="CollisionShape3D" parent="."]
+shape = SubResource("CapsuleShape3D_customer")
+
+[node name="CustomerMesh" type="MeshInstance3D" parent="."]
+mesh = SubResource("CapsuleMesh_customer")
+surface_material_override/0 = SubResource("StandardMaterial3D_customer")

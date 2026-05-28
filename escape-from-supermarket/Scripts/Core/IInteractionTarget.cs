@@ -12,9 +12,9 @@ namespace EscapeFromSupermarket.Core
     {
         Node3D TargetNode { get; }
         Vector3 PromptWorldPosition { get; }
-        float InteractionRange { get; }
         bool RequiresInteract { get; }
         bool IsInteractionAvailable { get; }
+        bool IsPlayerInInteractionArea(PlayerController player);
         string GetInteractionPrompt();
         void Interact(PlayerController player);
     }

@@ -1,6 +1,5 @@
 using EscapeFromSupermarket.Architecture;
 using EscapeFromSupermarket.Commands;
-using EscapeFromSupermarket.Config;
 using EscapeFromSupermarket.Core;
 using EscapeFromSupermarket.Models;
 using Godot;
@@ -12,18 +11,16 @@ namespace EscapeFromSupermarket.Controllers
     {
         [Export] public ExtractionExitType ExitType { get; set; } = ExtractionExitType.FrontDoor;
 
-        private PrototypeBalance _balance = PrototypeBalance.Default;
         private RoundObjectiveModel _objective;
+        private bool _playerInside;
 
         public Node3D TargetNode => this;
         public Vector3 PromptWorldPosition => GlobalPosition + Vector3.Up * 0.8f;
-        public float InteractionRange => _balance.InteractionRange;
         public bool RequiresInteract => false;
         public bool IsInteractionAvailable => Visible;
 
         public override void _Ready()
         {
-            _balance = this.GetUtility<PrototypeBalance>();
             _objective = this.GetModel<RoundObjectiveModel>();
             AddToGroup(InteractionGroups.Targets);
             BodyEntered += OnBodyEntered;
@@ -34,6 +31,7 @@ namespace EscapeFromSupermarket.Controllers
         {
             if (body is PlayerController)
             {
+                _playerInside = true;
                 this.SendCommand(new StartExtractionCommand(ExitType));
             }
         }
@@ -42,8 +40,14 @@ namespace EscapeFromSupermarket.Controllers
         {
             if (body is PlayerController)
             {
+                _playerInside = false;
                 this.SendCommand(new CancelExtractionCommand());
             }
+        }
+
+        public bool IsPlayerInInteractionArea(PlayerController player)
+        {
+            return _playerInside;
         }
 
         public string GetInteractionPrompt()

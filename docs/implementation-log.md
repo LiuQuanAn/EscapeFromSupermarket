@@ -91,11 +91,40 @@ Implemented `docs/shelf-item-identification-spec.md` so shelf loot starts hidden
 - Commands / picking — added `IdentifyShelfItemCommand`; `CanPickProductQuery` rejects unknown items before capacity and weight checks.
 - UI / interruption — `ShelfPanelController` now shows unknown placeholders, one active countdown/progress bar, complete item details only after identification, and resets unfinished progress when the panel closes, round ends, or the player leaves shelf range.
 
+### 2026-05-26 — Per-shelf spawn weights — commit `pending`
+
+Moved shelf refresh tuning from global category rules into editor-exposed `ShelfController` instance data.
+
+- `ShelfSpawnEntryResource.cs` defines one editor entry containing `ProductTypeId` and `Weight`.
+- `ShelfController.cs` exposes per-instance min/max spawn count and one `SpawnOptions` array of product-weight entries.
+- `ShelfModel.cs` registers shelf configs from scene instances and refreshes items by weighted random selection using `weight / totalWeight`.
+- `PrototypeBalance.cs` no longer owns `ShelfSpawnRule` / `Shelves`; product definitions remain there.
+- `Main.tscn` configures each shelf instance with `SpawnOptions` entries instead of parallel product/weight arrays.
+
+### 2026-05-28 — Interaction uses Area3D overlap — commit `pending`
+
+Changed interaction eligibility from center-distance radius to each target's `Area3D` overlap state.
+
+- `IInteractionTarget` now exposes `IsPlayerInInteractionArea(PlayerController)`.
+- `InteractionManagerController` selects only targets whose interaction area contains the player, then picks the nearest overlapping target.
+- `ShelfController`, `KeycardController`, and `ExtractionZoneController` maintain player-inside state from `BodyEntered` / `BodyExited`.
+- `ShelfPanelController` closes the shelf UI when the player leaves the shelf overlap area, not when exceeding the old global radius.
+- Removed obsolete `PrototypeBalance.InteractionRange`.
+- Fixed the discount shelf's product ids in `Main.tscn` from `toyshark` / `plasticcup` to `toy_shark` / `plastic_cup`; the previous ids stopped that shelf before it could register as an interaction target.
+
+### 2026-05-28 — Cart load thresholds use weight-limit percentages — commit `pending`
+
+Changed cart load tier thresholds from absolute weights to percentages of `CartWeightLimit`.
+
+- `PrototypeBalance.cs` now exposes `MidLoadMinWeightPercent = 0.50f` and `HeavyLoadMinWeightPercent = 0.80f`.
+- `GetCartLoadTier()` derives runtime thresholds from `CartWeightLimit * percent`; with the current limit `15`, Mid starts at weight `8` and Heavy starts at weight `12`.
+
 ## Pending
 
 - V0.2 manual 5-10 round playtest: route choice, employee-door usage, router pickup, upgrade order, customer blocking feel, UI readability, and 3-5 minute round length.
 - V0.2 tuning pass in `PrototypeBalance`: movement/load multipliers, guard vision/alert/chase, extraction timing, product value/slots/weight, customer speed/push, upgrade prices.
 - Manual shelf-identification playtest: order reveal, close/reopen reset, same-round remembered identified items, and unknown-item pick rejection.
+- Manual shelf-spawn verification in editor: each shelf instance exposes count range, product ids, and weights; repeated rounds match configured pools.
 
 ## Plan revisions
 
@@ -107,6 +136,9 @@ Implemented `docs/shelf-item-identification-spec.md` so shelf loot starts hidden
 | 2026-05-23 | Second codex review batch (above) — no plan text change, just implementation refinement. | — |
 | 2026-05-24 | V0.2 vertical slice scoped by `docs/v0.2-vertical-slice-spec.md`: interaction prompts, keycard/staff door, router objective, runtime meta progress, upgrades, customers, and 5-10 round tuning target. | V0.2 spec |
 | 2026-05-24 | Shelf interaction now requires per-round item identification before pick, scoped by `docs/shelf-item-identification-spec.md`. | Shelf item identification spec |
+| 2026-05-26 | Shelf refresh tuning moved from `PrototypeBalance.Shelves` to per-instance `ShelfController` editor fields. | User request |
+| 2026-05-28 | Interaction eligibility moved from global radius to each interaction target's `Area3D` overlap area. | User request |
+| 2026-05-28 | Cart load thresholds changed from absolute weights to percentages of `CartWeightLimit`. | User request |
 
 ## Convention for new entries
 

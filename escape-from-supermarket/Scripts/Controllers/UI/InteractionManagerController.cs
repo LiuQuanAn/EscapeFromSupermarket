@@ -61,10 +61,10 @@ namespace EscapeFromSupermarket.Controllers.UI
             {
                 if (node is not IInteractionTarget target) continue;
                 if (!target.IsInteractionAvailable) continue;
+                if (!target.IsPlayerInInteractionArea(_player)) continue;
 
                 float distSq = _player.GlobalPosition.DistanceSquaredTo(target.TargetNode.GlobalPosition);
-                float range = target.InteractionRange;
-                if (distSq > range * range || distSq >= bestDistSq) continue;
+                if (distSq >= bestDistSq) continue;
 
                 bestDistSq = distSq;
                 _currentTarget = target;

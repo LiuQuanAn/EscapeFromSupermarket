@@ -7,13 +7,6 @@ using QFramework;
 
 namespace EscapeFromSupermarket.Config
 {
-	// 货架刷新规则：定义单个货架每轮从哪个商品分类池里随机生成多少商品。
-	// ShelfId / 货架编号：匹配场景里的 ShelfController.ShelfId。
-	// Category / 商品分类：匹配 Product.Category，用来选择随机商品池。
-	// MinItemCount / 最少商品数：该货架每轮至少刷出的商品数量。
-	// MaxItemCount / 最多商品数：该货架每轮最多刷出的商品数量。
-	public sealed record ShelfSpawnRule(int ShelfId, string Category, int MinItemCount, int MaxItemCount);
-
 	// PrototypeBalance：原型阶段唯一调参入口。
 	// 只在需要改变真实地图位置或实例路线时，才去改场景节点 Inspector / Transform。
 	public sealed class PrototypeBalance : IUtility
@@ -48,11 +41,11 @@ namespace EscapeFromSupermarket.Config
 		// CartWeightLimit / 购物车重量上限：超过该重量时不能继续拾取商品。
 		public int CartWeightLimit => 15;
 
-		// MidLoadMinWeight / 中载重起点：当前重量达到该值后进入 Mid 载重档。
-		public int MidLoadMinWeight => 10;
+		// MidLoadMinWeightPercent / 中载重起点百分比：以 CartWeightLimit 为基数，当前重量达到 50% 后进入 Mid 载重档。
+		public float MidLoadMinWeightPercent => 0.50f;
 
-		// HeavyLoadMinWeight / 重载重起点：当前重量达到该值后进入 Heavy 载重档。
-		public int HeavyLoadMinWeight => 20;
+		// HeavyLoadMinWeightPercent / 重载重起点百分比：以 CartWeightLimit 为基数，当前重量达到 80% 后进入 Heavy 载重档。
+		public float HeavyLoadMinWeightPercent => 0.80f;
 
 		// EmptyLoadSpeedMultiplier / 空载速度倍率：空载档位下玩家速度乘数。
 		public float EmptyLoadSpeedMultiplier => 1.00f;
@@ -146,11 +139,6 @@ namespace EscapeFromSupermarket.Config
 		// CustomerPushDecay / 顾客推开衰减：顾客被推开后的额外速度每秒衰减速度。
 		public float CustomerPushDecay => 6.0f;
 
-		// ===== 交互 =====
-
-		// InteractionRange / 交互距离：玩家距离目标小于该值时显示提示并允许交互。
-		public float InteractionRange => 2.8f;
-
 		// ===== 货架识别 =====
 
 		// CommonIdentificationSeconds / 普通物品识别时间：普通商品从未知变为已识别需要的秒数。
@@ -175,6 +163,9 @@ namespace EscapeFromSupermarket.Config
 		// TaskKey / 任务标记：非空时参与本轮目标判断；Rarity / 稀有度：决定非任务商品识别时间。
 		public IReadOnlyList<Product> Products { get; } = new[]
 		{
+			new Product("plastic_cup", "塑料杯", 3, 1, 1, "日用品"),
+			new Product("toy_shark", "玩具鲨鱼", 4, 1, 1, "玩具"),
+			new Product("discountrise", "临期米饭", 2, 1, 1, "零食"),
 			// chips / 薯片：价值 6，占 1 格，重 1，零食类；作用：低价值轻量商品。
 			new Product("chips", "薯片", 6, 1, 1, "零食"),
 			// canned_soup / 罐头汤：价值 9，占 1 格，重 3，零食类；作用：稍重的低价值商品。
@@ -189,23 +180,6 @@ namespace EscapeFromSupermarket.Config
 			new Product("television", "电视", 70, 5, 16, "家电", Rarity: ProductRarity.HighRare),
 			// router / 路由器：价值 80，占 2 格，重 2，家电类，任务标记 router；作用：V0.2 目标商品。
 			new Product("router", "路由器", 80, 2, 2, "家电", RouterTaskKey, ProductRarity.HighRare),
-		};
-
-		// ===== 货架随机刷新 =====
-
-		// Shelves / 货架刷新表：定义每个货架从哪个分类随机抽商品，以及每轮数量范围。
-		// ShelfSpawnRule 参数顺序：
-		// ShelfId / 货架编号；Category / 商品分类；MinItemCount / 最少商品数；MaxItemCount / 最多商品数。
-		public IReadOnlyList<ShelfSpawnRule> Shelves { get; } = new[]
-		{
-			// 1 号零食货架：每轮刷新 2 到 4 件零食。
-			new ShelfSpawnRule(1, "零食", 2, 4),
-			// 2 号零食货架：每轮刷新 2 到 4 件零食。
-			new ShelfSpawnRule(2, "零食", 2, 4),
-			// 3 号日用品货架：每轮刷新 2 到 4 件日用品。
-			new ShelfSpawnRule(3, "日用品", 2, 4),
-			// 4 号家电货架：每轮刷新 2 到 4 件家电。
-			new ShelfSpawnRule(4, "家电", 2, 4),
 		};
 
 		// ===== 派生计算 =====
@@ -243,8 +217,11 @@ namespace EscapeFromSupermarket.Config
 		// GetCartLoadTier / 获取购物车载重档位：根据当前重量判断 Empty、Mid、Heavy。
 		public CartLoadTier GetCartLoadTier(int weight)
 		{
-			if (weight < MidLoadMinWeight) return CartLoadTier.Empty;
-			if (weight < HeavyLoadMinWeight) return CartLoadTier.Mid;
+			float midLoadMinWeight = CartWeightLimit * MidLoadMinWeightPercent;
+			float heavyLoadMinWeight = CartWeightLimit * HeavyLoadMinWeightPercent;
+
+			if (weight < midLoadMinWeight) return CartLoadTier.Empty;
+			if (weight < heavyLoadMinWeight) return CartLoadTier.Mid;
 			return CartLoadTier.Heavy;
 		}
 

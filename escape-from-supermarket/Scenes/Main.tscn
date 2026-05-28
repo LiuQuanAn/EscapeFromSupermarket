@@ -2,53 +2,77 @@
 
 [ext_resource type="Script" uid="uid://b33b1l6c16fos" path="res://Scripts/Controllers/GameRoot.cs" id="1_root"]
 [ext_resource type="Script" uid="uid://tyggc8b8btkn" path="res://Scripts/Controllers/PlayerController.cs" id="2_player"]
-[ext_resource type="Script" uid="uid://jelgq1ld52dq" path="res://Scripts/Controllers/ShelfController.cs" id="3_shelf"]
 [ext_resource type="Script" uid="uid://ee7m0bq0vn1f" path="res://Scripts/Controllers/UI/ShelfPanelController.cs" id="4_shelf_panel"]
 [ext_resource type="Script" uid="uid://cr2pbxawp50vb" path="res://Scripts/Controllers/UI/HudController.cs" id="5_hud"]
-[ext_resource type="Script" uid="uid://b8mi1gbiqfoi8" path="res://Scripts/Controllers/ExtractionZoneController.cs" id="6_extract"]
-[ext_resource type="Script" uid="uid://bn35w3vh7ipun" path="res://Scripts/Controllers/GuardController.cs" id="7_guard"]
 [ext_resource type="Script" uid="uid://br4ob1rwsd8lo" path="res://Scripts/Controllers/UI/ResultPanelController.cs" id="8_result_panel"]
 [ext_resource type="Script" uid="uid://c03exbjie7f4c" path="res://Scripts/Controllers/UI/CartPanelController.cs" id="9_cart_panel"]
 [ext_resource type="Script" uid="uid://d38besqcivog2" path="res://Scripts/Controllers/UI/InteractionManagerController.cs" id="10_interaction"]
 [ext_resource type="Script" uid="uid://eo8s16mych65" path="res://Scripts/Controllers/KeycardController.cs" id="11_keycard"]
-[ext_resource type="Script" uid="uid://dofecopug5nve" path="res://Scripts/Controllers/CustomerController.cs" id="12_customer"]
+[ext_resource type="PackedScene" uid="uid://1im4dxbgnr22" path="res://Scenes/Prefabs/InteractiveShelf.tscn" id="13_interactive_shelf"]
+[ext_resource type="PackedScene" path="res://Scenes/Prefabs/GuardWithPatrol.tscn" id="14_guard_prefab"]
+[ext_resource type="PackedScene" path="res://Scenes/Prefabs/Customer.tscn" id="15_customer_prefab"]
+[ext_resource type="PackedScene" path="res://Scenes/Prefabs/ExtractionZone.tscn" id="16_extraction_prefab"]
+[ext_resource type="Script" uid="uid://bsta82t2q8qmj" path="res://Scripts/Config/ShelfSpawnEntryResource.cs" id="17_shelf_spawn_entry"]
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_floor"]
-size = Vector2(30, 30)
+size = Vector2(60, 60)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_floor"]
-size = Vector3(30, 0.1, 30)
+size = Vector3(60, 0.1, 60)
 
 [sub_resource type="BoxMesh" id="BoxMesh_outer_wall"]
-size = Vector3(30, 2, 0.4)
+size = Vector3(60, 2, 0.4)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_wall"]
 albedo_color = Color(0.45, 0.42, 0.36, 1)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_outer_wall"]
-size = Vector3(30, 2, 0.4)
+size = Vector3(60, 2, 0.4)
 
-[sub_resource type="BoxMesh" id="BoxMesh_shelf_block"]
-size = Vector3(1.4, 1.5, 7.5)
+[sub_resource type="Resource" id="Resource_shelf1_chips"]
+script = ExtResource("17_shelf_spawn_entry")
+ProductTypeId = "chips"
+Weight = 70
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_shelf"]
-albedo_color = Color(0.25, 0.32, 0.46, 1)
+[sub_resource type="Resource" id="Resource_shelf1_canned_soup"]
+script = ExtResource("17_shelf_spawn_entry")
+ProductTypeId = "canned_soup"
+Weight = 30
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_shelf_block"]
-size = Vector3(1.4, 1.5, 7.5)
+[sub_resource type="Resource" id="Resource_shelf2_chips"]
+script = ExtResource("17_shelf_spawn_entry")
+ProductTypeId = "chips"
+Weight = 55
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_shelf_interact"]
-size = Vector3(2.4, 2, 4)
+[sub_resource type="Resource" id="Resource_shelf2_canned_soup"]
+script = ExtResource("17_shelf_spawn_entry")
+ProductTypeId = "canned_soup"
+Weight = 45
 
-[sub_resource type="BoxMesh" id="BoxMesh_extraction"]
-size = Vector3(4, 0.05, 2.5)
+[sub_resource type="Resource" id="Resource_shelf3_toothpaste"]
+script = ExtResource("17_shelf_spawn_entry")
+ProductTypeId = "toothpaste"
+Weight = 65
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_extraction"]
-transparency = 1
-albedo_color = Color(0.1, 0.85, 0.45, 0.35)
+[sub_resource type="Resource" id="Resource_shelf3_detergent"]
+script = ExtResource("17_shelf_spawn_entry")
+ProductTypeId = "detergent"
+Weight = 35
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_extraction"]
-size = Vector3(4, 2, 2.5)
+[sub_resource type="Resource" id="Resource_shelf4_microwave"]
+script = ExtResource("17_shelf_spawn_entry")
+ProductTypeId = "microwave"
+Weight = 45
+
+[sub_resource type="Resource" id="Resource_shelf4_television"]
+script = ExtResource("17_shelf_spawn_entry")
+ProductTypeId = "television"
+Weight = 25
+
+[sub_resource type="Resource" id="Resource_shelf4_router"]
+script = ExtResource("17_shelf_spawn_entry")
+ProductTypeId = "router"
+Weight = 30
 
 [sub_resource type="BoxMesh" id="BoxMesh_keycard"]
 size = Vector3(0.8, 0.08, 0.5)
@@ -63,39 +87,45 @@ size = Vector3(1.4, 1, 1.4)
 radius = 0.4
 height = 1.6
 
+[sub_resource type="BoxShape3D" id="BoxShape3D_cart"]
+size = Vector3(0.9, 0.6, 0.8)
+
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_player"]
 radius = 0.4
 height = 1.6
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_guard"]
-albedo_color = Color(0.75, 0.18, 0.18, 1)
-
-[sub_resource type="BoxMesh" id="BoxMesh_vision"]
-size = Vector3(3.5, 0.03, 7)
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_vision"]
-transparency = 1
-albedo_color = Color(1, 0.2, 0.1, 0.22)
-
-[sub_resource type="Curve3D" id="Curve3D_guard_patrol"]
-closed = true
-_data = {
-"points": PackedVector3Array(0, 0, 0, 0, 0, 0, 0, 0.8, 10, 0, 0, 0, 0, 0, 0, 0, 0.8, -10, 0, 0, 0, 0, 0, 0, 7, 0.8, -10, 0, 0, 0, 0, 0, 0, 7, 0.8, 10),
-"tilts": PackedFloat32Array(0, 0, 0, 0)
-}
-point_count = 4
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_customer"]
-albedo_color = Color(0.2, 0.62, 0.82, 1)
-
-[sub_resource type="BoxShape3D" id="BoxShape3D_cart"]
-size = Vector3(0.9, 0.6, 0.8)
 
 [sub_resource type="BoxMesh" id="BoxMesh_cart"]
 size = Vector3(0.9, 0.6, 0.8)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_cart"]
 albedo_color = Color(0.55, 0.55, 0.6, 1)
+
+[sub_resource type="Resource" id="Resource_shelf5_chips"]
+script = ExtResource("17_shelf_spawn_entry")
+ProductTypeId = "toy_shark"
+Weight = 30
+
+[sub_resource type="Resource" id="Resource_shelf5_canned_soup"]
+script = ExtResource("17_shelf_spawn_entry")
+ProductTypeId = "plastic_cup"
+Weight = 50
+
+[sub_resource type="Resource" id="Resource_shelf5_toothpaste"]
+script = ExtResource("17_shelf_spawn_entry")
+ProductTypeId = "discountrise"
+Weight = 80
+
+[sub_resource type="BoxMesh" id="BoxMesh_frkhe"]
+size = Vector3(4, 1.5, 4)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_1p5hy"]
+size = Vector3(4, 1.5, 4)
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_h1m7h"]
+size = Vector2(7, 7)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_frkhe"]
+size = Vector3(7, 4, 7)
 
 [node name="Main" type="Node3D" unique_id=456689059]
 script = ExtResource("1_root")
@@ -116,7 +146,7 @@ shape = SubResource("BoxShape3D_floor")
 [node name="MapObstacles" type="Node3D" parent="." unique_id=518745115]
 
 [node name="NorthWall" type="StaticBody3D" parent="MapObstacles" unique_id=896686537]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, -14.8)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, -29.8)
 
 [node name="NorthWallMesh" type="MeshInstance3D" parent="MapObstacles/NorthWall" unique_id=636146018]
 mesh = SubResource("BoxMesh_outer_wall")
@@ -126,7 +156,7 @@ surface_material_override/0 = SubResource("StandardMaterial3D_wall")
 shape = SubResource("BoxShape3D_outer_wall")
 
 [node name="SouthWall" type="StaticBody3D" parent="MapObstacles" unique_id=1012170294]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 14.8)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 29.8)
 
 [node name="SouthWallMesh" type="MeshInstance3D" parent="MapObstacles/SouthWall" unique_id=2074833476]
 mesh = SubResource("BoxMesh_outer_wall")
@@ -136,7 +166,7 @@ surface_material_override/0 = SubResource("StandardMaterial3D_wall")
 shape = SubResource("BoxShape3D_outer_wall")
 
 [node name="WestWall" type="StaticBody3D" parent="MapObstacles" unique_id=560644965]
-transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, -14.8, 1, 0)
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, -29.8, 1, 0)
 
 [node name="WestWallMesh" type="MeshInstance3D" parent="MapObstacles/WestWall" unique_id=737640639]
 mesh = SubResource("BoxMesh_outer_wall")
@@ -146,7 +176,7 @@ surface_material_override/0 = SubResource("StandardMaterial3D_wall")
 shape = SubResource("BoxShape3D_outer_wall")
 
 [node name="EastWall" type="StaticBody3D" parent="MapObstacles" unique_id=1463547161]
-transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 14.8, 1, 0)
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 29.8, 1, 0)
 
 [node name="EastWallMesh" type="MeshInstance3D" parent="MapObstacles/EastWall" unique_id=658039725]
 mesh = SubResource("BoxMesh_outer_wall")
@@ -155,104 +185,48 @@ surface_material_override/0 = SubResource("StandardMaterial3D_wall")
 [node name="EastWallCollision" type="CollisionShape3D" parent="MapObstacles/EastWall" unique_id=1615465537]
 shape = SubResource("BoxShape3D_outer_wall")
 
-[node name="LeftAisleShelfNorth" type="StaticBody3D" parent="MapObstacles" unique_id=249140072]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.8, 0.75, -5.2)
-
-[node name="LeftAisleShelfNorthMesh" type="MeshInstance3D" parent="MapObstacles/LeftAisleShelfNorth" unique_id=914333217]
-mesh = SubResource("BoxMesh_shelf_block")
-surface_material_override/0 = SubResource("StandardMaterial3D_shelf")
-
-[node name="LeftAisleShelfNorthCollision" type="CollisionShape3D" parent="MapObstacles/LeftAisleShelfNorth" unique_id=834933870]
-shape = SubResource("BoxShape3D_shelf_block")
-
-[node name="LeftAisleShelfSouth" type="StaticBody3D" parent="MapObstacles" unique_id=385114984]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.8, 0.75, 5.2)
-
-[node name="LeftAisleShelfSouthMesh" type="MeshInstance3D" parent="MapObstacles/LeftAisleShelfSouth" unique_id=76810009]
-mesh = SubResource("BoxMesh_shelf_block")
-surface_material_override/0 = SubResource("StandardMaterial3D_shelf")
-
-[node name="LeftAisleShelfSouthCollision" type="CollisionShape3D" parent="MapObstacles/LeftAisleShelfSouth" unique_id=1670405440]
-shape = SubResource("BoxShape3D_shelf_block")
-
-[node name="RightAisleShelfNorth" type="StaticBody3D" parent="MapObstacles" unique_id=1093407213]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.8, 0.75, -5.2)
-
-[node name="RightAisleShelfNorthMesh" type="MeshInstance3D" parent="MapObstacles/RightAisleShelfNorth" unique_id=875031916]
-mesh = SubResource("BoxMesh_shelf_block")
-surface_material_override/0 = SubResource("StandardMaterial3D_shelf")
-
-[node name="RightAisleShelfNorthCollision" type="CollisionShape3D" parent="MapObstacles/RightAisleShelfNorth" unique_id=61431726]
-shape = SubResource("BoxShape3D_shelf_block")
-
-[node name="RightAisleShelfSouth" type="StaticBody3D" parent="MapObstacles" unique_id=1915740607]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.8, 0.75, 5.2)
-
-[node name="RightAisleShelfSouthMesh" type="MeshInstance3D" parent="MapObstacles/RightAisleShelfSouth" unique_id=1765199318]
-mesh = SubResource("BoxMesh_shelf_block")
-surface_material_override/0 = SubResource("StandardMaterial3D_shelf")
-
-[node name="RightAisleShelfSouthCollision" type="CollisionShape3D" parent="MapObstacles/RightAisleShelfSouth" unique_id=1307727780]
-shape = SubResource("BoxShape3D_shelf_block")
-
-[node name="Shelf1" type="Area3D" parent="." unique_id=628518898]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.6, 0.9, -5.2)
-script = ExtResource("3_shelf")
+[node name="Shelf1" parent="." unique_id=628518898 instance=ExtResource("13_interactive_shelf")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20.8, 0.75, 13)
 ShelfId = 1
 ShelfName = "零食货架"
+SpawnOptions = Array[ExtResource("17_shelf_spawn_entry")]([SubResource("Resource_shelf1_chips"), SubResource("Resource_shelf1_canned_soup")])
 
-[node name="InteractShape" type="CollisionShape3D" parent="Shelf1" unique_id=1204916210]
-shape = SubResource("BoxShape3D_shelf_interact")
-
-[node name="Shelf2" type="Area3D" parent="." unique_id=1767428526]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.6, 0.9, 5.2)
-script = ExtResource("3_shelf")
+[node name="Shelf2" parent="." unique_id=1767428526 instance=ExtResource("13_interactive_shelf")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -25.8, 0.75, 13)
 ShelfId = 2
 ShelfName = "零食货架"
+SpawnOptions = Array[ExtResource("17_shelf_spawn_entry")]([SubResource("Resource_shelf2_chips"), SubResource("Resource_shelf2_canned_soup")])
 
-[node name="InteractShape" type="CollisionShape3D" parent="Shelf2" unique_id=1760528920]
-shape = SubResource("BoxShape3D_shelf_interact")
-
-[node name="Shelf3" type="Area3D" parent="." unique_id=380214470]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.6, 0.9, -5.2)
-script = ExtResource("3_shelf")
+[node name="Shelf3" parent="." unique_id=380214470 instance=ExtResource("13_interactive_shelf")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -26.2, 0.75, 0.8000002)
 ShelfId = 3
 ShelfName = "日用品货架"
+SpawnOptions = Array[ExtResource("17_shelf_spawn_entry")]([SubResource("Resource_shelf3_toothpaste"), SubResource("Resource_shelf3_detergent")])
 
-[node name="InteractShape" type="CollisionShape3D" parent="Shelf3" unique_id=435841773]
-shape = SubResource("BoxShape3D_shelf_interact")
+[node name="Shelf5" parent="." unique_id=2062766032 instance=ExtResource("13_interactive_shelf")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20.400002, 1.5, 1.6000004)
+ShelfId = 3
+ShelfName = "日用品货架"
+SpawnOptions = Array[ExtResource("17_shelf_spawn_entry")]([SubResource("Resource_shelf3_toothpaste"), SubResource("Resource_shelf3_detergent")])
 
-[node name="Shelf4" type="Area3D" parent="." unique_id=1474171355]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.6, 0.9, 5.2)
-script = ExtResource("3_shelf")
+[node name="Shelf4" parent="." unique_id=1474171355 instance=ExtResource("13_interactive_shelf")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -29.2, 0.75, -11.8)
 ShelfId = 4
 ShelfName = "家电货架"
+SpawnOptions = Array[ExtResource("17_shelf_spawn_entry")]([SubResource("Resource_shelf4_microwave"), SubResource("Resource_shelf4_television"), SubResource("Resource_shelf4_router")])
 
-[node name="InteractShape" type="CollisionShape3D" parent="Shelf4" unique_id=131918597]
-shape = SubResource("BoxShape3D_shelf_interact")
+[node name="Shelf4" parent="Shelf4" unique_id=2024315712 instance=ExtResource("13_interactive_shelf")]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 4.799999, 0.75, -3.8000002)
+ShelfId = 4
+ShelfName = "家电货架"
+SpawnOptions = Array[ExtResource("17_shelf_spawn_entry")]([SubResource("Resource_shelf4_microwave"), SubResource("Resource_shelf4_television"), SubResource("Resource_shelf4_router")])
 
-[node name="FrontDoorExtractionZone" type="Area3D" parent="." unique_id=1397566067]
+[node name="FrontDoorExtractionZone" parent="." unique_id=1397566067 instance=ExtResource("16_extraction_prefab")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, -12.2)
-script = ExtResource("6_extract")
 
-[node name="ExtractionMesh" type="MeshInstance3D" parent="FrontDoorExtractionZone" unique_id=1761242851]
-mesh = SubResource("BoxMesh_extraction")
-surface_material_override/0 = SubResource("StandardMaterial3D_extraction")
-
-[node name="ExtractionShape" type="CollisionShape3D" parent="FrontDoorExtractionZone" unique_id=1417685396]
-shape = SubResource("BoxShape3D_extraction")
-
-[node name="StaffDoorExtractionZone" type="Area3D" parent="." unique_id=1032752191]
+[node name="StaffDoorExtractionZone" parent="." unique_id=1032752191 instance=ExtResource("16_extraction_prefab")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.2, 0.1, 7.4)
-script = ExtResource("6_extract")
 ExitType = 1
-
-[node name="ExtractionMesh" type="MeshInstance3D" parent="StaffDoorExtractionZone" unique_id=1155513330]
-mesh = SubResource("BoxMesh_extraction")
-surface_material_override/0 = SubResource("StandardMaterial3D_extraction")
-
-[node name="ExtractionShape" type="CollisionShape3D" parent="StaffDoorExtractionZone" unique_id=920893563]
-shape = SubResource("BoxShape3D_extraction")
 
 [node name="Keycard" type="Area3D" parent="." unique_id=526752927]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.5, 0.45, 10)
@@ -265,67 +239,25 @@ surface_material_override/0 = SubResource("StandardMaterial3D_keycard")
 [node name="KeycardShape" type="CollisionShape3D" parent="Keycard" unique_id=1567650896]
 shape = SubResource("BoxShape3D_keycard")
 
-[node name="Guard" type="CharacterBody3D" parent="." unique_id=2143211057]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 8)
-script = ExtResource("7_guard")
-PatrolPathNode = NodePath("../GuardPatrolPath")
+[node name="Guard" parent="." unique_id=2143211057 instance=ExtResource("14_guard_prefab")]
 
-[node name="GuardCollision" type="CollisionShape3D" parent="Guard" unique_id=387792184]
-shape = SubResource("CapsuleShape3D_player")
-
-[node name="GuardMesh" type="MeshInstance3D" parent="Guard" unique_id=76555133]
-mesh = SubResource("CapsuleMesh_player")
-surface_material_override/0 = SubResource("StandardMaterial3D_guard")
-
-[node name="VisionCone" type="MeshInstance3D" parent="Guard" unique_id=1670274262]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.75, -3.5)
-mesh = SubResource("BoxMesh_vision")
-surface_material_override/0 = SubResource("StandardMaterial3D_vision")
-
-[node name="GuardPatrolPath" type="Path3D" parent="." unique_id=1093497534]
-curve = SubResource("Curve3D_guard_patrol")
-
-[node name="CustomerLeft" type="CharacterBody3D" parent="." unique_id=611912530]
+[node name="CustomerLeft" parent="." unique_id=611912530 instance=ExtResource("15_customer_prefab")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 0.8, -8)
-script = ExtResource("12_customer")
 PointA = Vector3(-6, 0.8, -8)
 PointB = Vector3(-6, 0.8, -2)
 
-[node name="CustomerLeftCollision" type="CollisionShape3D" parent="CustomerLeft" unique_id=1228776566]
-shape = SubResource("CapsuleShape3D_player")
-
-[node name="CustomerLeftMesh" type="MeshInstance3D" parent="CustomerLeft" unique_id=1950220627]
-mesh = SubResource("CapsuleMesh_player")
-surface_material_override/0 = SubResource("StandardMaterial3D_customer")
-
-[node name="CustomerRight" type="CharacterBody3D" parent="." unique_id=1766928671]
+[node name="CustomerRight" parent="." unique_id=1766928671 instance=ExtResource("15_customer_prefab")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 0.8, 2)
-script = ExtResource("12_customer")
 PointA = Vector3(6, 0.8, 2)
 PointB = Vector3(6, 0.8, 8)
 
-[node name="CustomerRightCollision" type="CollisionShape3D" parent="CustomerRight" unique_id=1994573343]
-shape = SubResource("CapsuleShape3D_player")
-
-[node name="CustomerRightMesh" type="MeshInstance3D" parent="CustomerRight" unique_id=1915457963]
-mesh = SubResource("CapsuleMesh_player")
-surface_material_override/0 = SubResource("StandardMaterial3D_customer")
-
-[node name="CustomerCenter" type="CharacterBody3D" parent="." unique_id=134386161]
+[node name="CustomerCenter" parent="." unique_id=134386161 instance=ExtResource("15_customer_prefab")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.5, 0.8, 6)
-script = ExtResource("12_customer")
 PointA = Vector3(-1.5, 0.8, 6)
 PointB = Vector3(2.5, 0.8, 6)
 
-[node name="CustomerCenterCollision" type="CollisionShape3D" parent="CustomerCenter" unique_id=1102455584]
-shape = SubResource("CapsuleShape3D_player")
-
-[node name="CustomerCenterMesh" type="MeshInstance3D" parent="CustomerCenter" unique_id=1318142409]
-mesh = SubResource("CapsuleMesh_player")
-surface_material_override/0 = SubResource("StandardMaterial3D_customer")
-
 [node name="Player" type="CharacterBody3D" parent="." unique_id=605871368]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -26.317575, 0.7999981, 28.257236)
 script = ExtResource("2_player")
 
 [node name="PlayerCollision" type="CollisionShape3D" parent="Player" unique_id=2017531067]
@@ -540,3 +472,27 @@ text = "基础速度"
 [node name="RestartButton" type="Button" parent="UI/ResultPanel/Margin/Content" unique_id=400938562]
 layout_mode = 2
 text = "下一轮"
+
+[node name="InteractiveShelf" parent="." unique_id=364390779 instance=ExtResource("13_interactive_shelf")]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, -23, 0.75, 22)
+ShelfId = 5
+ShelfName = "折扣货架"
+MinItemCount = 4
+MaxItemCount = 6
+SpawnOptions = Array[ExtResource("17_shelf_spawn_entry")]([SubResource("Resource_shelf5_chips"), SubResource("Resource_shelf5_canned_soup"), SubResource("Resource_shelf5_toothpaste")])
+
+[node name="ShelfMesh" parent="InteractiveShelf/ShelfBody" parent_id_path=PackedInt32Array(364390779, 378144972) index="0" unique_id=1691369392]
+mesh = SubResource("BoxMesh_frkhe")
+
+[node name="ShelfCollision" parent="InteractiveShelf/ShelfBody" parent_id_path=PackedInt32Array(364390779, 378144972) index="1" unique_id=1787125398]
+shape = SubResource("BoxShape3D_1p5hy")
+
+[node name="InteractProjection" parent="InteractiveShelf" index="1" unique_id=1775040049]
+mesh = SubResource("PlaneMesh_h1m7h")
+
+[node name="InteractShape" parent="InteractiveShelf" index="2" unique_id=178001353]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.14999998, 0)
+shape = SubResource("BoxShape3D_frkhe")
+
+[editable path="Guard"]
+[editable path="InteractiveShelf"]

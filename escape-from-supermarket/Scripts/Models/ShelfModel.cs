@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
-using EscapeFromSupermarket.Config;
 using EscapeFromSupermarket.Utilities;
 using QFramework;
 
@@ -10,12 +8,21 @@ using QFramework;
 namespace EscapeFromSupermarket.Models
 {
     public sealed record ShelfItemInstance(int InstanceId, Product Product);
+    public sealed record ShelfSpawnOption(string ProductTypeId, int Weight);
+
+    internal sealed record ShelfSpawnConfig(
+        int ShelfId,
+        int MinItemCount,
+        int MaxItemCount,
+        IReadOnlyList<ResolvedShelfSpawnOption> Options);
+
+    internal sealed record ResolvedShelfSpawnOption(Product Product, int Weight);
 
     public class ShelfModel : AbstractModel
     {
         private int _nextInstanceId;
         private ProductCatalog _catalog;
-        private PrototypeBalance _balance = PrototypeBalance.Default;
+        private readonly Dictionary<int, ShelfSpawnConfig> _configs = new();
         private readonly HashSet<int> _identifiedInstanceIds = new();
 
         public Dictionary<int, List<ShelfItemInstance>> Inventories { get; } = new();
@@ -23,8 +30,36 @@ namespace EscapeFromSupermarket.Models
         protected override void OnInit()
         {
             _catalog = this.GetUtility<ProductCatalog>();
-            _balance = this.GetUtility<PrototypeBalance>();
-            RefreshRound();
+        }
+
+        public void RegisterShelfConfig(
+            int shelfId,
+            int minItemCount,
+            int maxItemCount,
+            IReadOnlyList<ShelfSpawnOption> options)
+        {
+            if (shelfId <= 0) throw new InvalidOperationException($"ShelfId must be > 0; got {shelfId}.");
+            if (minItemCount < 0) throw new InvalidOperationException($"Shelf {shelfId} MinItemCount must be >= 0.");
+            if (maxItemCount < minItemCount) throw new InvalidOperationException($"Shelf {shelfId} MaxItemCount must be >= MinItemCount.");
+            if (options.Count == 0) throw new InvalidOperationException($"Shelf {shelfId} requires at least one spawn option.");
+
+            var resolved = new List<ResolvedShelfSpawnOption>(options.Count);
+            for (int i = 0; i < options.Count; i++)
+            {
+                var option = options[i];
+                var product = _catalog.FindByTypeId(option.ProductTypeId)
+                    ?? throw new InvalidOperationException($"Shelf {shelfId} references unknown ProductTypeId '{option.ProductTypeId}'.");
+                if (option.Weight <= 0) throw new InvalidOperationException($"Shelf {shelfId} product '{option.ProductTypeId}' weight must be > 0.");
+                resolved.Add(new ResolvedShelfSpawnOption(product, option.Weight));
+            }
+
+            var config = new ShelfSpawnConfig(shelfId, minItemCount, maxItemCount, resolved);
+            _configs[shelfId] = config;
+
+            if (!Inventories.ContainsKey(shelfId))
+            {
+                FillShelf(config);
+            }
         }
 
         public void RefreshRound()
@@ -32,16 +67,11 @@ namespace EscapeFromSupermarket.Models
             Inventories.Clear();
             _identifiedInstanceIds.Clear();
             _nextInstanceId = 0;
-            if (_catalog == null) return;
 
-            foreach (var shelf in _balance.Shelves)
+            foreach (var config in _configs.Values)
             {
-                var count = Random.Shared.Next(shelf.MinItemCount, shelf.MaxItemCount + 1);
-                FillShelf(shelf.ShelfId, _catalog.GetByCategory(shelf.Category), count);
+                FillShelf(config);
             }
-
-            EnsureProductAppears(PrototypeBalance.RouterTaskKey);
-            EnsureHighValueProductAppears();
         }
 
         public ShelfItemInstance FindItem(int shelfId, int instanceId)
@@ -85,81 +115,42 @@ namespace EscapeFromSupermarket.Models
             return true;
         }
 
-        private void FillShelf(int shelfId, IReadOnlyList<Product> products, int count)
+        private void FillShelf(ShelfSpawnConfig config)
         {
-            var items = new List<ShelfItemInstance>();
-            if (products.Count == 0)
-            {
-                Inventories[shelfId] = items;
-                return;
-            }
+            int count = Random.Shared.Next(config.MinItemCount, config.MaxItemCount + 1);
+            var items = new List<ShelfItemInstance>(count);
 
             for (int i = 0; i < count; i++)
             {
-                var product = PickLowRepeatProduct(products, items);
+                var product = PickWeightedProduct(config.Options);
                 items.Add(new ShelfItemInstance(Interlocked.Increment(ref _nextInstanceId), product));
             }
 
-            Inventories[shelfId] = items;
+            Inventories[config.ShelfId] = items;
         }
 
-        private static Product PickLowRepeatProduct(IReadOnlyList<Product> products, List<ShelfItemInstance> existing)
+        private static Product PickWeightedProduct(IReadOnlyList<ResolvedShelfSpawnOption> options)
         {
-            if (products.Count == 1) return products[0];
-
-            int attempts = products.Count * 2;
-            for (int i = 0; i < attempts; i++)
+            int totalWeight = 0;
+            for (int i = 0; i < options.Count; i++)
             {
-                var candidate = products[Random.Shared.Next(products.Count)];
-                if (existing.TrueForAll(x => x.Product.ProductTypeId != candidate.ProductTypeId))
-                {
-                    return candidate;
-                }
+                totalWeight += options[i].Weight;
             }
 
-            return products[Random.Shared.Next(products.Count)];
-        }
-
-        private void EnsureProductAppears(string productTypeId)
-        {
-            if (Inventories.Values.Any(items => items.Exists(item => item.Product.ProductTypeId == productTypeId))) return;
-
-            var product = _catalog.FindByTypeId(productTypeId);
-            if (product == null) return;
-            ReplaceOrAppendProduct(product);
-        }
-
-        private void EnsureHighValueProductAppears()
-        {
-            if (Inventories.Values.Any(items => items.Exists(item => item.Product.Value >= _balance.HighValueProductMinValue))) return;
-
-            var product = _catalog.All
-                .Where(x => x.Value >= _balance.HighValueProductMinValue)
-                .OrderByDescending(x => x.Value)
-                .FirstOrDefault();
-            if (product != null) ReplaceOrAppendProduct(product);
-        }
-
-        private void ReplaceOrAppendProduct(Product product)
-        {
-            var rule = _balance.Shelves.FirstOrDefault(x => x.Category == product.Category);
-            if (rule == null) return;
-
-            if (!Inventories.TryGetValue(rule.ShelfId, out var items))
+            if (totalWeight <= 0)
             {
-                items = new List<ShelfItemInstance>();
-                Inventories[rule.ShelfId] = items;
+                throw new InvalidOperationException("Shelf spawn total weight must be > 0.");
             }
 
-            if (items.Count >= rule.MaxItemCount)
+            int roll = Random.Shared.Next(1, totalWeight + 1);
+            int cumulative = 0;
+            for (int i = 0; i < options.Count; i++)
             {
-                var replaceIndex = Random.Shared.Next(items.Count);
-                items[replaceIndex] = new ShelfItemInstance(Interlocked.Increment(ref _nextInstanceId), product);
+                cumulative += options[i].Weight;
+                if (roll <= cumulative) return options[i].Product;
             }
-            else
-            {
-                items.Add(new ShelfItemInstance(Interlocked.Increment(ref _nextInstanceId), product));
-            }
+
+            throw new InvalidOperationException("Weighted shelf product selection failed.");
         }
     }
 }
