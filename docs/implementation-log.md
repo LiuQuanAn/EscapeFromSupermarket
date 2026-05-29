@@ -119,6 +119,17 @@ Changed cart load tier thresholds from absolute weights to percentages of `CartW
 - `PrototypeBalance.cs` now exposes `MidLoadMinWeightPercent = 0.50f` and `HeavyLoadMinWeightPercent = 0.80f`.
 - `GetCartLoadTier()` derives runtime thresholds from `CartWeightLimit * percent`; with the current limit `15`, Mid starts at weight `8` and Heavy starts at weight `12`.
 
+### 2026-05-29 — Harness infrastructure — commit `pending`
+
+Added repo-level harness support so design and implementation agents can route work, verify changes, and leave durable state without relying on chat history.
+
+- `AGENTS.md` is now manually maintained in Chinese as the top-level route file; `docs/harness/DESIGN_AGENT.md` and `docs/harness/IMPLEMENT_AGENT.md` hold role-specific rules, including implementation verification and session close rules.
+- `.gitignore` ignores `tools/harness/logs/`; `global.json` pins the .NET SDK to `10.0.202`.
+- `docs/features.md` records the current implementation feature state; split progress lives in `docs/harness/DESIGN_PROGRESS.md` and `docs/harness/IMPLEMENTATION_PROGRESS.md`; implementation progress is a current snapshot, not a second history log.
+- `escape-from-supermarket/Scripts/ARCHITECTURE.md` provides the code-near layer guide and QFramework fork offsets.
+- `tools/harness/verify.ps1` runs the standard gate: `dotnet build` plus Godot 4.6.3 headless load of `Scenes/Main.tscn`, with focused Godot script/runtime error marker scanning.
+- Verification: `powershell -ExecutionPolicy Bypass -File tools\harness\verify.ps1` passed after rerunning outside the sandbox for NuGet/Godot SDK access; the sandbox run failed on package resolution.
+
 ## Pending
 
 - V0.2 manual 5-10 round playtest: route choice, employee-door usage, router pickup, upgrade order, customer blocking feel, UI readability, and 3-5 minute round length.

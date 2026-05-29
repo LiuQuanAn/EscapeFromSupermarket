@@ -1,50 +1,26 @@
-# Project Codex Rules
+## 对话和工作方式
 
-Codex-only project guidance lives above the auto-sync block. The block below is regenerated from Claude memory by `~/.claude/scripts/sync-memory-to-codex.ps1` — do not edit between the markers.
+- 和用户对话必须使用简体中文。
+- 每次对话调用 caveman 插件：表达要短，保留技术细节，去掉寒暄和填充话。
+- 编写代码前先说明关键假设、成功标准和验证方式；不清楚就先问，不要默默猜。
+- 简单优先：用能解决问题的最少代码，不做请求之外的功能，不为只用一次的代码抽象。
+- 精准修改：只改和当前任务直接相关的文件。不要顺手重构、顺手格式化、顺手删除原本存在的死代码。
+- 避免防御性兜底。需要报错就报错；确实需要防御性处理时，必须留下明确警告或失败信号。
+- 一次只推进一个 active task。未完成当前任务前，不开启新的无关修复。
 
-<!-- BEGIN AUTO-SYNC: claude-memory-to-codex -->
-# Project Memory (synced from ~/.claude/projects/c--Users-Administrator-Documents-----/memory)
+## 项目入口
 
-## project-implementation-log.md
+- 仓库根目录：`C:\Users\Administrator\Documents\速通超市`
+- Godot 项目目录：`escape-from-supermarket`
+- 主场景：`escape-from-supermarket/Scenes/Main.tscn`
+- Godot C# 工程：`escape-from-supermarket/EscapeFromSupermarket.sln`
+- .NET SDK：`10.0.202`（由仓库根目录 `global.json` 固定）
+- Godot 版本：`4.6.3.stable.mono`
+- Godot console 默认路径：`D:\Program Files\Godot\Godot_v4.6.3-stable_mono_win64_console.exe`
 
----
-name: project-implementation-log
-description: escape-from-supermarket keeps a long-term engineering log at docs/implementation-log.md. Always read it before proposing new feature work to avoid re-implementing completed plan steps or fix batches.
-metadata: 
-  node_type: memory
-  type: project
-  originSessionId: 8d5a2042-5560-4624-939a-06d8efe37d25
----
+## 开工前必读
 
-The project's authoritative implementation history lives at `docs/implementation-log.md` in the repo (`escape-from-supermarket/...` is the Godot subdir; the log sits at repo root under `docs/`).
-
-**Read before proposing work.** Each entry is dated and pinned to a commit SHA. If you are about to write or re-implement a plan step (Step N) or a Codex-review item (Major #N / Minor #N), grep the log first. If it is already listed with a commit, do not duplicate — propose only delta or next-step work.
-
-**Write after landing work.** Every commit that closes a plan step, applies a Codex review batch, or revises the plan must append a new entry under §Completed, update §Pending, and update §Plan revisions when the plan text changes. The format convention is documented at the bottom of the log itself.
-
-The canonical plan is at `~/.claude/plans/https-github-com-liangxiegame-qframework-giggly-scone.md` (workstation-local). When the plan revises, mirror the headline into §Plan revisions of the log.
-
-
-## qframework-local-fork.md
-
----
-name: qframework-local-fork
-description: QFramework.cs in this project is a local fork — do NOT treat upstream behavior as truth. Specific bug fixes already applied; see file header banner for full diff list.
-metadata: 
-  node_type: memory
-  type: project
-  originSessionId: 8d5a2042-5560-4624-939a-06d8efe37d25
----
-
-`escape-from-supermarket/addons/qframework/QFramework.cs` is a local fork of liangxiegame/QFramework Godot port. Upstream tracking is abandoned. The file's own header banner ("LOCAL FORK NOTICE") lists every divergence.
-
-**Why:** Several Critical/Major bugs in upstream (static `BindableProperty.Comparer` cross-instance pollution; non-idempotent `CustomUnRegister`/`BindablePropertyUnRegister`; `OrEvent.UnRegister` cascading bug; `HashSet` modify-during-iterate in `MakeSureArchitecture`; duplicate-type re-registration init double-run; `UnRegisterWhenNodeExitTree` no signal detach; thread-unsafe `EasyEvents`/`MakeSureArchitecture`). User opted for direct source edits over patch files because struct/private-static/extension-method targets cannot be overridden externally.
-
-**How to apply:**
-- Before recommending or referencing any QFramework API behavior, read the file's header banner first (lines 1-55) — it lists every behavior that differs from public QFramework docs.
-- Spec divergence accepted: `IController`/`ISystem`/`ICommand` legitimately have `ICanGetUtility`; `IController`/`ICommand` legitimately have `ICanSendQuery`; `ISystem` legitimately has `ICanSendCommand` (Systems own state mutation pipelines that need to dispatch Commands directly — e.g. TimerSystem ends round, ExtractionSystem completes extraction). The 4-layer rule doc is informational only — code is canonical.
-- Added API: `Architecture<T>.Reset()` (static) — clears `mArchitecture` + `OnRegisterPatch` for scene reload / test isolation. Use in test teardown and on full scene swap.
-- Comparer is now instance, not static: `new BindableProperty<int>().WithComparer(...)` no longer pollutes other instances. Default uses `EqualityComparer<T>.Default.Equals`.
-- Unity-only blocks (`UnRegisterOnDestroyTrigger`, `UnRegisterWhenGameObjectDestroyed`, `ComparerAutoRegister`, `EditorMenus`) were removed entirely.
-- Codex `AGENTS.md` is auto-synced from this memory via the global sync script — no separate sync needed.
-<!-- END AUTO-SYNC -->
+- 玩法、数值、spec、playtest、文案任务走设计师 agent；C#、Godot 场景、构建、bug、harness 任务走程序员 agent。
+- 设计师 agent 读取 `docs/harness/DESIGN_AGENT.md`。
+- 程序员 agent 读取 `docs/harness/IMPLEMENT_AGENT.md`。
+- 涉及 QFramework API 前，先读 `escape-from-supermarket/addons/qframework/QFramework.cs` 文件头的 `LOCAL FORK NOTICE`。本项目使用本地 fork，不以上游文档为准。

@@ -11,3 +11,6 @@ escape-from-supermarket/obj/
 
 # Codex review scratch
 .codex_review_input.txt
+
+# Harness verify logs
+tools/harness/logs/
