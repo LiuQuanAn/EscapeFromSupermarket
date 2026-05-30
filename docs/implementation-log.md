@@ -130,6 +130,16 @@ Added repo-level harness support so design and implementation agents can route w
 - `tools/harness/verify.ps1` runs the standard gate: `dotnet build` plus Godot 4.6.3 headless load of `Scenes/Main.tscn`, with focused Godot script/runtime error marker scanning.
 - Verification: `powershell -ExecutionPolicy Bypass -File tools\harness\verify.ps1` passed after rerunning outside the sandbox for NuGet/Godot SDK access; the sandbox run failed on package resolution.
 
+### 2026-05-30 — Replace speed upgrade with weight-limit upgrade — commit `pending`
+
+Changed the second meta upgrade from player speed growth to cart weight-limit growth.
+
+- `UpgradeType.PlayerSpeed` became `UpgradeType.CartWeightLimit`; `MetaProgressModel` now tracks `CartWeightLimitLevel`.
+- `PrototypeBalance.cs` now tunes `CartWeightLimitUpgradeBonus = 5` plus weight-limit upgrade price and price step.
+- `CartModel.GetWeightLimit(level)` derives the active weight limit, and pick validation / HUD weight display read the meta level.
+- `MovementSystem` and `PlayerController` no longer apply a speed-upgrade multiplier.
+- Result panel button text changed from “基础速度” to “购物车载重”.
+
 ## Pending
 
 - V0.2 manual 5-10 round playtest: route choice, employee-door usage, router pickup, upgrade order, customer blocking feel, UI readability, and 3-5 minute round length.
@@ -150,6 +160,7 @@ Added repo-level harness support so design and implementation agents can route w
 | 2026-05-26 | Shelf refresh tuning moved from `PrototypeBalance.Shelves` to per-instance `ShelfController` editor fields. | User request |
 | 2026-05-28 | Interaction eligibility moved from global radius to each interaction target's `Area3D` overlap area. | User request |
 | 2026-05-28 | Cart load thresholds changed from absolute weights to percentages of `CartWeightLimit`. | User request |
+| 2026-05-30 | Meta progression second upgrade changed from player speed to cart weight-limit growth. | User request |
 
 ## Convention for new entries
 

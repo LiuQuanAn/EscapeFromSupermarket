@@ -53,7 +53,7 @@ namespace EscapeFromSupermarket.Controllers
             float mult = _movement.GetSpeedMultiplier(_cart.LoadTier.Value);
             float slowMult = _customerSlowTimer > 0.0f ? _balance.CustomerSlowMultiplier : 1.0f;
             _customerSlowTimer = Mathf.Max(0.0f, _customerSlowTimer - (float)delta);
-            Velocity = dir * _balance.PlayerBaseSpeed * _movement.GetPlayerSpeedUpgradeMultiplier() * mult * slowMult;
+            Velocity = dir * _balance.PlayerBaseSpeed * mult * slowMult;
             MoveAndSlide();
 
             if (dir.LengthSquared() > 0.01f)

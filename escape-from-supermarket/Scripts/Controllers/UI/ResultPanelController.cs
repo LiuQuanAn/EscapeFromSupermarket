@@ -16,7 +16,7 @@ namespace EscapeFromSupermarket.Controllers.UI
         private Label _itemsLabel;
         private Label _metaLabel;
         private Button _capacityUpgradeButton;
-        private Button _speedUpgradeButton;
+        private Button _weightLimitUpgradeButton;
         private Button _restartButton;
         private RoundResult _lastResult;
 
@@ -28,12 +28,12 @@ namespace EscapeFromSupermarket.Controllers.UI
                 ?? GetNodeOrNull<Label>("Margin/Content/ItemsLabel");
             _metaLabel = GetNodeOrNull<Label>("Margin/Content/MetaLabel");
             _capacityUpgradeButton = GetNodeOrNull<Button>("Margin/Content/CapacityUpgradeButton");
-            _speedUpgradeButton = GetNodeOrNull<Button>("Margin/Content/SpeedUpgradeButton");
+            _weightLimitUpgradeButton = GetNodeOrNull<Button>("Margin/Content/WeightLimitUpgradeButton");
             _restartButton = GetNodeOrNull<Button>("Margin/Content/RestartButton");
 
             Visible = false;
             if (_capacityUpgradeButton != null) _capacityUpgradeButton.Pressed += () => BuyUpgrade(UpgradeType.CartCapacity);
-            if (_speedUpgradeButton != null) _speedUpgradeButton.Pressed += () => BuyUpgrade(UpgradeType.PlayerSpeed);
+            if (_weightLimitUpgradeButton != null) _weightLimitUpgradeButton.Pressed += () => BuyUpgrade(UpgradeType.CartWeightLimit);
             if (_restartButton != null) _restartButton.Pressed += StartNextRound;
 
             this.RegisterEvent<RoundEndedEvent>(OnRoundEnded)
@@ -61,7 +61,7 @@ namespace EscapeFromSupermarket.Controllers.UI
             if (_metaLabel != null) _metaLabel.Text = BuildMetaSummary(meta);
 
             UpdateUpgradeButton(_capacityUpgradeButton, UpgradeType.CartCapacity, "购物车容量", meta);
-            UpdateUpgradeButton(_speedUpgradeButton, UpgradeType.PlayerSpeed, "基础速度", meta);
+            UpdateUpgradeButton(_weightLimitUpgradeButton, UpgradeType.CartWeightLimit, "购物车载重", meta);
         }
 
         private static string BuildReason(GameStateModel gameState)

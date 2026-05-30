@@ -1,15 +1,16 @@
+using System;
 using QFramework;
 
 namespace EscapeFromSupermarket.Models
 {
-    public enum UpgradeType { CartCapacity, PlayerSpeed }
+    public enum UpgradeType { CartCapacity, CartWeightLimit }
 
     public class MetaProgressModel : AbstractModel
     {
         public BindableProperty<int> Money { get; } = new(0);
         public BindableProperty<int> NavigationProgress { get; } = new(0);
         public BindableProperty<int> CartCapacityLevel { get; } = new(0);
-        public BindableProperty<int> PlayerSpeedLevel { get; } = new(0);
+        public BindableProperty<int> CartWeightLimitLevel { get; } = new(0);
 
         protected override void OnInit()
         {
@@ -17,20 +18,26 @@ namespace EscapeFromSupermarket.Models
 
         public int GetLevel(UpgradeType upgradeType)
         {
-            return upgradeType == UpgradeType.CartCapacity
-                ? CartCapacityLevel.Value
-                : PlayerSpeedLevel.Value;
+            return upgradeType switch
+            {
+                UpgradeType.CartCapacity => CartCapacityLevel.Value,
+                UpgradeType.CartWeightLimit => CartWeightLimitLevel.Value,
+                _ => throw new ArgumentOutOfRangeException(nameof(upgradeType), upgradeType, "Unknown upgrade type."),
+            };
         }
 
         public void AddLevel(UpgradeType upgradeType)
         {
-            if (upgradeType == UpgradeType.CartCapacity)
+            switch (upgradeType)
             {
-                CartCapacityLevel.Value++;
-            }
-            else
-            {
-                PlayerSpeedLevel.Value++;
+                case UpgradeType.CartCapacity:
+                    CartCapacityLevel.Value++;
+                    break;
+                case UpgradeType.CartWeightLimit:
+                    CartWeightLimitLevel.Value++;
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(upgradeType), upgradeType, "Unknown upgrade type.");
             }
         }
     }

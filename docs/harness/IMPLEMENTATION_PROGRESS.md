@@ -6,10 +6,10 @@
 
 ## Current State
 
-- Date: 2026-05-29
+- Date: 2026-05-30
 - Active implementation task: none
 - Current batch: none
-- Next implementation step: commit harness documentation batch or wait for next approved task
+- Next implementation step: wait for next approved implementation task
 - Blocked: no
 
 ## Last Verification
@@ -21,19 +21,12 @@
 
 ## Dirty Worktree Notes
 
-Expected harness changes currently in progress:
+Current known worktree changes:
 
-- `.gitignore`
-- `AGENTS.md`
-- `docs/features.md`
-- `docs/harness-gap-plan.md`
-- `docs/harness/DESIGN_AGENT.md`
-- `docs/harness/IMPLEMENT_AGENT.md`
-- `docs/harness/DESIGN_PROGRESS.md`
-- `docs/harness/IMPLEMENTATION_PROGRESS.md`
-- `escape-from-supermarket/Scripts/ARCHITECTURE.md`
-- `global.json`
-- `tools/harness/verify.ps1`
+- `docs/harness/IMPLEMENT_AGENT.md` — assistant doc update for `Scenes/Test.tscn`.
+- `docs/harness/IMPLEMENTATION_PROGRESS.md` — assistant snapshot update.
+- `escape-from-supermarket/Scenes/Test.tscn` — user-created test scene; do not remove.
+- `escape-from-supermarket/Scripts/Controllers/ExtractionZoneController.cs` — existing user worktree change; do not revert.
 
 Ignored generated output:
 

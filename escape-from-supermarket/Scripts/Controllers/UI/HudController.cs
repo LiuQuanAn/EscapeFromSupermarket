@@ -40,9 +40,15 @@ namespace EscapeFromSupermarket.Controllers.UI
             if (_alertBar != null) _alertBar.Visible = false;
 
             _cart = this.GetModel<CartModel>();
+            _metaProgress = this.GetModel<MetaProgressModel>();
             if (_cart == null)
             {
                 GD.PushError($"{nameof(HudController)} requires {nameof(CartModel)} to be registered before UI starts.");
+                return;
+            }
+            if (_metaProgress == null)
+            {
+                GD.PushError($"{nameof(HudController)} requires {nameof(MetaProgressModel)} to show meta upgrade values.");
                 return;
             }
 
@@ -54,12 +60,10 @@ namespace EscapeFromSupermarket.Controllers.UI
                 .UnRegisterWhenNodeExitTree(this);
             this.RegisterEvent<CartItemsChangedEvent>(_ => UpdateObjective())
                 .UnRegisterWhenNodeExitTree(this);
-            _metaProgress = this.GetModel<MetaProgressModel>();
-            if (_metaProgress != null)
-            {
-                _metaProgress.CartCapacityLevel.RegisterWithInitValue(_ => UpdateSlots(_cart.CurrentSlots.Value))
-                    .UnRegisterWhenNodeExitTree(this);
-            }
+            _metaProgress.CartCapacityLevel.RegisterWithInitValue(_ => UpdateSlots(_cart.CurrentSlots.Value))
+                .UnRegisterWhenNodeExitTree(this);
+            _metaProgress.CartWeightLimitLevel.RegisterWithInitValue(_ => UpdateWeight(_cart.CurrentWeight.Value))
+                .UnRegisterWhenNodeExitTree(this);
 
             _gameState = this.GetModel<GameStateModel>();
             if (_gameState == null)
@@ -92,13 +96,14 @@ namespace EscapeFromSupermarket.Controllers.UI
 
         private void UpdateSlots(int value)
         {
-            int capacity = _cart.GetCapacity(_metaProgress?.CartCapacityLevel.Value ?? 0);
+            int capacity = _cart.GetCapacity(_metaProgress.CartCapacityLevel.Value);
             if (_slotsLabel != null) _slotsLabel.Text = $"格子：{value}/{capacity}";
         }
 
         private void UpdateWeight(int value)
         {
-            if (_weightLabel != null) _weightLabel.Text = $"重量：{value}/{_cart.WeightLimit}";
+            int weightLimit = _cart.GetWeightLimit(_metaProgress.CartWeightLimitLevel.Value);
+            if (_weightLabel != null) _weightLabel.Text = $"重量：{value}/{weightLimit}";
         }
 
         private void UpdateValue(int value)

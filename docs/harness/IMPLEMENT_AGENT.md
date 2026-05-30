@@ -39,6 +39,11 @@
 - 单独编译：在 `escape-from-supermarket` 目录运行 `dotnet build .\EscapeFromSupermarket.sln`。
 - Godot 不在默认路径时，用 `$env:GODOT_BIN` 或 `-GodotBin` 指定 console 版可执行文件。
 
+## 测试场景
+
+- `escape-from-supermarket/Scenes/Test.tscn` 是用户创建的测试用场景。局部实现或调试可优先用它缩小验证范围。
+- 标准门禁仍以 `Scenes/Main.tscn` 为准；若任务明确使用测试场景，汇报中写清 `Test.tscn` 的验证命令和结果。
+
 ## Definition of Done
 
 - 代码、场景或验证脚本改动已通过对应验证；如果只完成编译但未完成运行时验证，必须明确说明。

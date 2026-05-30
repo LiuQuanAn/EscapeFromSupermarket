@@ -35,7 +35,8 @@ namespace EscapeFromSupermarket.Queries
                 return new CanPickProductResult(false, "购物车格子不够。");
             }
 
-            if (cart.CurrentWeight.Value + item.Product.Weight > cart.WeightLimit)
+            int weightLimit = cart.GetWeightLimit(meta.CartWeightLimitLevel.Value);
+            if (cart.CurrentWeight.Value + item.Product.Weight > weightLimit)
             {
                 return new CanPickProductResult(false, "购物车太重。");
             }

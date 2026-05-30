@@ -18,7 +18,6 @@ namespace EscapeFromSupermarket.Models
         private PrototypeBalance _balance = PrototypeBalance.Default;
 
         public int Capacity => _balance.CartCapacity;
-        public int WeightLimit => _balance.CartWeightLimit;
 
         public BindableProperty<int> CurrentSlots { get; } = new(0);
         public BindableProperty<int> CurrentWeight { get; } = new(0);
@@ -40,6 +39,11 @@ namespace EscapeFromSupermarket.Models
         public int GetCapacity(int capacityUpgradeLevel)
         {
             return _balance.CartCapacity + capacityUpgradeLevel * _balance.CartCapacityUpgradeBonus;
+        }
+
+        public int GetWeightLimit(int weightLimitUpgradeLevel)
+        {
+            return _balance.CartWeightLimit + weightLimitUpgradeLevel * _balance.CartWeightLimitUpgradeBonus;
         }
 
         /// <summary>

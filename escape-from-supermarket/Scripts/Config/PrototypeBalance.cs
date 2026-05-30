@@ -41,6 +41,9 @@ namespace EscapeFromSupermarket.Config
 		// CartWeightLimit / 购物车重量上限：超过该重量时不能继续拾取商品。
 		public int CartWeightLimit => 15;
 
+		// CartWeightLimitUpgradeBonus / 载重升级增量：每级购物车载重升级增加的重量上限。
+		public int CartWeightLimitUpgradeBonus => 5;
+
 		// MidLoadMinWeightPercent / 中载重起点百分比：以 CartWeightLimit 为基数，当前重量达到 50% 后进入 Mid 载重档。
 		public float MidLoadMinWeightPercent => 0.50f;
 
@@ -51,24 +54,21 @@ namespace EscapeFromSupermarket.Config
 		public float EmptyLoadSpeedMultiplier => 1.00f;
 
 		// MidLoadSpeedMultiplier / 中载速度倍率：中载档位下玩家速度乘数。
-		public float MidLoadSpeedMultiplier => 0.8f;
+		public float MidLoadSpeedMultiplier => 0.5f;
 
 		// HeavyLoadSpeedMultiplier / 重载速度倍率：重载档位下玩家速度乘数。
-		public float HeavyLoadSpeedMultiplier => 0.5f;
+		public float HeavyLoadSpeedMultiplier => 0.2f;
 
 		// CartCollisionLocalOffset / 购物车碰撞体本地偏移：让购物车碰撞盒保持在玩家身前。
 		public Vector3 CartCollisionLocalOffset => new(0.0f, -0.2f, -0.9f);
 
 		// ===== 玩家移动 =====
 
-		// PlayerBaseSpeed / 玩家基础速度：无载重惩罚、无升级时的移动速度。
+		// PlayerBaseSpeed / 玩家基础速度：无载重惩罚时的移动速度。
 		public float PlayerBaseSpeed => 4.5f;
 
 		// PlayerTurnSpeed / 玩家转向速度：角色视觉朝移动方向旋转的速度。
 		public float PlayerTurnSpeed => 12.0f;
-
-		// PlayerSpeedUpgradeMultiplier / 速度升级倍率：每级基础移动速度升级都会乘一次该倍率。
-		public float PlayerSpeedUpgradeMultiplier => 1.05f;
 
 		// CustomerSlowMultiplier / 顾客碰撞减速倍率：玩家碰到顾客后短时间内的速度乘数。
 		public float CustomerSlowMultiplier => 0.75f;
@@ -94,7 +94,7 @@ namespace EscapeFromSupermarket.Config
 		public float GuardViewAngleDegrees => 70.0f;
 
 		// GuardAlertRaiseRate / 警戒增长速度：保安看到带货玩家时每秒增加的警戒值。
-		public float GuardAlertRaiseRate => 0.55f;
+		public float GuardAlertRaiseRate => 10f;
 
 		// GuardAlertDecayRate / 警戒衰减速度：保安没看到玩家时每秒降低的警戒值。
 		public float GuardAlertDecayRate => 0.35f;
@@ -116,11 +116,11 @@ namespace EscapeFromSupermarket.Config
 		// CapacityUpgradePriceStep / 容量升级价格增量：每已有一级容量升级，下一次购买价格增加该值。
 		public int CapacityUpgradePriceStep => 20;
 
-		// SpeedUpgradeBasePrice / 速度升级基础价格：购买 0 级到 1 级基础速度升级的价格。
-		public int SpeedUpgradeBasePrice => 50;
+		// WeightLimitUpgradeBasePrice / 载重升级基础价格：购买 0 级到 1 级购物车载重升级的价格。
+		public int WeightLimitUpgradeBasePrice => 50;
 
-		// SpeedUpgradePriceStep / 速度升级价格增量：每已有一级速度升级，下一次购买价格增加该值。
-		public int SpeedUpgradePriceStep => 30;
+		// WeightLimitUpgradePriceStep / 载重升级价格增量：每已有一级载重升级，下一次购买价格增加该值。
+		public int WeightLimitUpgradePriceStep => 30;
 
 		// ===== 顾客 NPC =====
 
@@ -195,9 +195,12 @@ namespace EscapeFromSupermarket.Config
 		// GetUpgradePrice / 获取升级价格：根据升级类型和当前等级计算下一次购买费用。
 		public int GetUpgradePrice(UpgradeType upgradeType, int currentLevel)
 		{
-			return upgradeType == UpgradeType.CartCapacity
-				? CapacityUpgradeBasePrice + CapacityUpgradePriceStep * currentLevel
-				: SpeedUpgradeBasePrice + SpeedUpgradePriceStep * currentLevel;
+			return upgradeType switch
+			{
+				UpgradeType.CartCapacity => CapacityUpgradeBasePrice + CapacityUpgradePriceStep * currentLevel,
+				UpgradeType.CartWeightLimit => WeightLimitUpgradeBasePrice + WeightLimitUpgradePriceStep * currentLevel,
+				_ => throw new ArgumentOutOfRangeException(nameof(upgradeType), upgradeType, "Unknown upgrade type."),
+			};
 		}
 
 		// GetIdentificationSeconds / 获取识别时间：任务商品优先用任务时间，否则按稀有度返回读条秒数。
