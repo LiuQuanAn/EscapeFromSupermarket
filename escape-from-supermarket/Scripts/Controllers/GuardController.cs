@@ -11,15 +11,19 @@ namespace EscapeFromSupermarket.Controllers
     public partial class GuardController : CharacterBody3D, IController
     {
         [Export] public NodePath PatrolPathNode { get; set; }
+        [Export] public NodePath NavigationAgentNode { get; set; }
 
         private PrototypeBalance _balance = PrototypeBalance.Default;
         private GuardModel _guard;
         private CartModel _cart;
         private GameStateModel _gameState;
         private PlayerController _player;
+        private NavigationAgent3D _navigationAgent;
         private Path3D _patrolPath;
         private Curve3D _patrolCurve;
         private int _patrolIndex;
+        private bool _hasNavigationTarget;
+        private Vector3 _navigationTarget;
         private bool _caughtFired;
 
         public override void _Ready()
@@ -36,6 +40,12 @@ namespace EscapeFromSupermarket.Controllers
                     $"{Name}: PatrolPathNode 未配置。请在 GuardController 实例上指定 Path3D 路线节点。");
             }
 
+            if (NavigationAgentNode == null || NavigationAgentNode.IsEmpty)
+            {
+                throw new InvalidOperationException($"{Name}: NavigationAgentNode is not assigned.");
+            }
+
+            _navigationAgent = GetNode<NavigationAgent3D>(NavigationAgentNode);
             _patrolPath = GetNode<Path3D>(PatrolPathNode);
             _patrolCurve = _patrolPath.Curve;
             if (_patrolCurve == null || _patrolCurve.PointCount == 0)
@@ -124,27 +134,44 @@ namespace EscapeFromSupermarket.Controllers
             var toTarget = target - GlobalPosition;
             toTarget.Y = 0;
 
+            // toTarget only gates patrol waypoint arrival; NavigationAgent3D provides movement direction.
             if (_guard.State.Value == GuardState.Patrolling && toTarget.Length() < _balance.GuardPatrolArrivalDistance)
             {
                 _patrolIndex = (_patrolIndex + 1) % _patrolCurve.PointCount;
-                toTarget = CurrentPatrolTarget() - GlobalPosition;
+                target = CurrentPatrolTarget();
+                toTarget = target - GlobalPosition;
                 toTarget.Y = 0;
             }
 
-            if (toTarget.LengthSquared() <= 0.0001f)
+            UpdateNavigationTarget(target);
+            var toNextPathPosition = _navigationAgent.GetNextPathPosition() - GlobalPosition;
+            toNextPathPosition.Y = 0;
+            if (toNextPathPosition.LengthSquared() <= 0.0001f)
             {
                 Velocity = Vector3.Zero;
                 MoveAndSlide();
                 return;
             }
 
-            var direction = toTarget.Normalized();
+            var direction = toNextPathPosition.Normalized();
             float speed = _guard.State.Value == GuardState.Chasing ? _balance.GuardChaseSpeed : _balance.GuardPatrolSpeed;
             Velocity = direction * speed;
             MoveAndSlide();
 
             float targetYaw = Mathf.Atan2(-direction.X, -direction.Z);
             Rotation = new Vector3(0, Mathf.LerpAngle(Rotation.Y, targetYaw, _balance.GuardTurnSpeed * delta), 0);
+        }
+
+        private void UpdateNavigationTarget(Vector3 target)
+        {
+            if (_hasNavigationTarget && _navigationTarget.DistanceSquaredTo(target) <= 0.25f)
+            {
+                return;
+            }
+
+            _navigationAgent.TargetPosition = target;
+            _navigationTarget = target;
+            _hasNavigationTarget = true;
         }
 
         private Vector3 CurrentPatrolTarget()

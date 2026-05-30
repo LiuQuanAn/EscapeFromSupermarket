@@ -13,12 +13,15 @@
 [ext_resource type="PackedScene" path="res://Scenes/Prefabs/Customer.tscn" id="15_customer_prefab"]
 [ext_resource type="PackedScene" path="res://Scenes/Prefabs/ExtractionZone.tscn" id="16_extraction_prefab"]
 [ext_resource type="Script" uid="uid://bsta82t2q8qmj" path="res://Scripts/Config/ShelfSpawnEntryResource.cs" id="17_shelf_spawn_entry"]
+[ext_resource type="Script" uid="uid://bdd72gxydfuxf" path="res://Scripts/Controllers/RuntimeNavigationRegionController.cs" id="18_runtime_navigation"]
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_floor"]
 size = Vector2(60, 60)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_floor"]
 size = Vector3(60, 0.1, 60)
+
+[sub_resource type="NavigationMesh" id="NavigationMesh_main"]
 
 [sub_resource type="BoxMesh" id="BoxMesh_outer_wall"]
 size = Vector3(60, 2, 0.4)
@@ -158,6 +161,11 @@ mesh = SubResource("PlaneMesh_floor")
 [node name="FloorCollision" type="CollisionShape3D" parent="Floor" unique_id=356617488]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.05, 0)
 shape = SubResource("BoxShape3D_floor")
+
+[node name="NavigationRegion" type="NavigationRegion3D" parent="."]
+navigation_mesh = SubResource("NavigationMesh_main")
+script = ExtResource("18_runtime_navigation")
+BakeRootNode = NodePath("..")
 
 [node name="MapObstacles" type="Node3D" parent="." unique_id=518745115]
 

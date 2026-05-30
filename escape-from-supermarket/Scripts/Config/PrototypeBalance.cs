@@ -82,7 +82,7 @@ namespace EscapeFromSupermarket.Config
 		public float GuardPatrolSpeed => 2.0f;
 
 		// GuardChaseSpeed / 保安追逐速度：警戒值满后追玩家时的移动速度。
-		public float GuardChaseSpeed => 3.5f;
+		public float GuardChaseSpeed => 4f;
 
 		// GuardTurnSpeed / 保安转向速度：保安朝移动方向旋转的速度。
 		public float GuardTurnSpeed => 10.0f;
@@ -178,8 +178,8 @@ namespace EscapeFromSupermarket.Config
 			new Product("microwave", "微波炉", 45, 4, 12, "家电", Rarity: ProductRarity.Rare),
 			// television / 电视：价值 70，占 5 格，重 16，家电类；作用：最高普通价值商品，制造容量和重量压力。
 			new Product("television", "电视", 70, 5, 16, "家电", Rarity: ProductRarity.HighRare),
-			// router / 路由器：价值 80，占 2 格，重 2，家电类，任务标记 router；作用：V0.2 目标商品。
-			new Product("router", "路由器", 80, 2, 2, "家电", RouterTaskKey, ProductRarity.HighRare),
+			// router / 路由器：价值 80，占 5 格，重 15，家电类，任务标记 router；作用：V0.2 目标商品。
+			new Product("router", "路由器", 80, 5, 15, "家电", RouterTaskKey, ProductRarity.HighRare),
 		};
 
 		// ===== 派生计算 =====

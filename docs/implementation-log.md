@@ -140,12 +140,22 @@ Changed the second meta upgrade from player speed growth to cart weight-limit gr
 - `MovementSystem` and `PlayerController` no longer apply a speed-upgrade multiplier.
 - Result panel button text changed from “基础速度” to “购物车载重”.
 
+### 2026-05-30 — Guard navigation agent pathing — commit `pending`
+
+Changed guard movement from direct steering toward patrol/player targets to Godot navigation path following.
+
+- `GuardController.cs` now requires a `NavigationAgent3D`, sets its target to the current patrol point or player position, and moves toward `GetNextPathPosition()`.
+- `GuardWithPatrol.tscn` adds a `NavigationAgent3D` under `GuardBody`; the agent is offset to the navmesh plane and uses a larger `path_desired_distance` so the first projected path point is consumed. Existing per-instance `Path3D` patrol routes remain unchanged.
+- `Main.tscn` adds a `NavigationRegion3D` and `NavigationMesh` resource.
+- `RuntimeNavigationRegionController.cs` bakes the navigation mesh at runtime from static colliders under the scene root, so shelf/wall layout changes update pathing without hand-maintaining baked mesh data.
+
 ## Pending
 
 - V0.2 manual 5-10 round playtest: route choice, employee-door usage, router pickup, upgrade order, customer blocking feel, UI readability, and 3-5 minute round length.
 - V0.2 tuning pass in `PrototypeBalance`: movement/load multipliers, guard vision/alert/chase, extraction timing, product value/slots/weight, customer speed/push, upgrade prices.
 - Manual shelf-identification playtest: order reveal, close/reopen reset, same-round remembered identified items, and unknown-item pick rejection.
 - Manual shelf-spawn verification in editor: each shelf instance exposes count range, product ids, and weights; repeated rounds match configured pools.
+- Manual guard navigation playtest: patrol and chase should route around shelves/walls, and narrow aisle gaps should be checked in the editor navmesh preview.
 
 ## Plan revisions
 
@@ -161,6 +171,7 @@ Changed the second meta upgrade from player speed growth to cart weight-limit gr
 | 2026-05-28 | Interaction eligibility moved from global radius to each interaction target's `Area3D` overlap area. | User request |
 | 2026-05-28 | Cart load thresholds changed from absolute weights to percentages of `CartWeightLimit`. | User request |
 | 2026-05-30 | Meta progression second upgrade changed from player speed to cart weight-limit growth. | User request |
+| 2026-05-30 | Guard patrol/chase movement now uses Godot `NavigationAgent3D` over a runtime-baked `NavigationRegion3D`. | User request |
 
 ## Convention for new entries
 
